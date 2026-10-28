@@ -1,0 +1,1 @@
+{"name":"book-companion-build-tools","private":true,"type":"module","dependencies":{"@esbuild/win32-x64":"0.25.9","esbuild":"0.25.9","react-dom":"18.3.1"}}

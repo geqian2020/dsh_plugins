@@ -1,0 +1,15 @@
+✔ QQ production recovers a corrupt state before starting its runtime and reports through the host logger (61.509ms)
+✔ QQ production retries a failed state load without blocking other bots or caching the failed store (49.0858ms)
+✔ QQ preserves state-read-failed through initialization, binding, reconnect RPC, QR activation and settings (19.7224ms)
+✔ QQ preserves state-backup-failed through initialization, binding, reconnect RPC, QR activation and settings (6.1917ms)
+✔ QQ preserves state-write-failed through initialization, binding, reconnect RPC, QR activation and settings (4.9497ms)
+✔ QQ preserves network through initialization, binding, reconnect RPC, QR activation and settings (4.088ms)
+✔ QQ state errors have English messages and expose only code and message (0.906ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3478.3599

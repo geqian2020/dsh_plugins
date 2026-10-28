@@ -1,0 +1,16 @@
+{
+  "package": "@xmanrui/dsh-im",
+  "version": "5.7.0",
+  "compatibility": {
+    "dsh": "0.2.1-rc.2",
+    "dshReleases": {
+      "0.2.0-rc.2": "compatible",
+      "0.2.1-rc.2": "compatible"
+    },
+    "profiles": [
+      "web"
+    ]
+  },
+  "originalProductionSha256": "654de055f8e8192c8fb381b3a9af2232d4e42224485bd2b216f8e94afd5f150d",
+  "status": "source-patched-build-and-live-test-pending"
+}

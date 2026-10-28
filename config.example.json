@@ -1,0 +1,13 @@
+{
+  "mainMemory": {
+    "excludeAgentPresets": ["book-companion"],
+    "excludeWorkspaceRoots": ["C:/Users/xiale/.dsh/book-companion/workspace"]
+  },
+  "imHost": {
+    "qq": {
+      "bookCompanionBots": {
+        "YOUR_BOT_ID": {"workspace": "C:/Users/xiale/.dsh/book-companion/workspace"}
+      }
+    }
+  }
+}

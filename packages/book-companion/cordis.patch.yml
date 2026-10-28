@@ -1,0 +1,8 @@
+- insert:
+    - id: preset-book-companion
+      name: '@deepseek-ai/dsh-agent-preset'
+      config:
+        id: book-companion
+        plugins:
+          - id: book-companion-runtime
+            name: dsh-book-companion

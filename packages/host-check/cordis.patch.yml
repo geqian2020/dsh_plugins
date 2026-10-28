@@ -1,0 +1,3 @@
+- insert:
+    - id: book-host-check
+      name: dsh-book-host-check

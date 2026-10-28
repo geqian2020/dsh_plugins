@@ -1,0 +1,14 @@
+# 依赖与第三方源码（体积大，按脚本重新生成/下载）
+node_modules/
+vendor/
+build-tools/node_modules/
+
+# 打包产物（由 scripts/pack.mjs 生成）
+*.tgz
+
+# 运行时数据（书童自己的阅读记忆库）
+data/
+
+# OpenViking fork 为生成物：scripts/prepare-memory-fork.mjs 从上游 0.5.20 生成
+# 如需归档可手动取消忽略
+packages/openviking-memory-isolated/

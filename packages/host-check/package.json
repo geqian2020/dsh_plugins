@@ -1,0 +1,1 @@
+{"name":"dsh-book-host-check","version":"0.0.4","private":true,"type":"module","main":"index.mjs","dsh":{"bundle":{"patch":"./cordis.patch.yml"}}}

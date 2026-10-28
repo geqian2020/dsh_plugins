@@ -1,0 +1,23 @@
+{
+  "package": "dsh-im-book-isolated",
+  "version": "5.7.0-book.1",
+  "external": [
+    "sharp",
+    "dingtalk-stream",
+    "qrcode",
+    "@larksuiteoapi/node-sdk",
+    "https-proxy-agent",
+    "react",
+    "@tencent-connect/qqbot-nodejs",
+    "@tencent-connect/qqbot-connector",
+    "undici",
+    "@wecom/aibot-node-sdk",
+    "@whiskeysockets/baileys",
+    "imapflow",
+    "mailparser",
+    "nodemailer",
+    "semver"
+  ],
+  "status": "built-external-runtime-dependencies-not-installed",
+  "note": "Host imports remain external. Production dependency install and QQ account smoke test required."
+}

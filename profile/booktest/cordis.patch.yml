@@ -1,0 +1,32 @@
+# booktest profile overlay (test profile, does not touch desktop)
+- id: agent-preset-registry
+  config:
+    default: book-companion
+
+- id: llm-pi-ai
+  config:
+    providers:
+      fake-gateway:
+        displayName: Fake Gateway
+        apiKeyEnv: FAKE_LLM_KEY
+        api: openai-completions
+        baseURL: http://127.0.0.1:19733/v1
+        models:
+          - id: fake-model
+            name: Fake Model
+            contextWindow: 200000
+            maxTokens: 16384
+
+- id: agent-default-model
+  config:
+    provider: fake-gateway
+    model: fake-model
+
+- id: host-probe
+  config:
+    outFile: D:/antigravity_veido/book-companion/artifacts/host-probe.jsonl
+
+- id: book-host-check
+  config:
+    cwd: D:/DSH/shutong
+    profileName: booktest

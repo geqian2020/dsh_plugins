@@ -1,0 +1,16 @@
+{
+  "at": "2026-10-28T15:27:42.953Z",
+  "exitCode": 0,
+  "output": "✔ installed DSH tool registry enforces bidirectional visibility and execution (177.1206ms)\n✔ persistent identity and protected workspace exclusion (2.7789ms)\n✔ main memory execution denied for companion (0.5047ms)\n✔ private store persists, separates authors, enforces identity and deletion (79.9257ms)\n✔ dialogue capture excludes injected context and preserves deletion on replay (47.3292ms)\n✔ episode network boundary rejects arbitrary URLs and redirect input (1.3328ms)\n✔ metadata extraction never claims complete reading (21.2408ms)\n✔ transcript segmentation preserves exact text and stable source references (0.6203ms)\n✔ patched upstream lifecycle never admits book sessions; normal sessions still work (5.9786ms)\n✔ patched QQ production actually applies the locked book route (17.149ms)\n✔ QQ route pins creation, rejects cross-session commands, and survives restart (17.1745ms)\n✔ voice uses platform transcript and reports missing recognition honestly (0.776ms)\nℹ tests 12\nℹ suites 0\nℹ pass 12\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 297.961\n",
+  "environment": "Installed DSH runtime snapshot; real tool/prompt services; memory lifecycle uses recorded fake service",
+  "liveProfileChanged": false,
+  "liveProfileSha256": "0513dfb4e5acc7679c98cd4427665422acf7a25b5ce2908f9671181bd8bce3cf",
+  "notVerified": [
+    "Complete live host composition and real model requests",
+    "OpenViking network request audit",
+    "QQ account delivery",
+    "Full podcast transcription and external ASR",
+    "Scheduled proactive delivery",
+    "Seven-day companion quality and latency/cost"
+  ]
+}

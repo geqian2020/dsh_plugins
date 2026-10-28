@@ -1,0 +1,23 @@
+{
+    "name":  "dsh-profile-booktest",
+    "private":  true,
+    "dependencies":  {
+                         "dsh-book-companion":  "file:D:/antigravity_veido/book-companion/dist/dsh-book-companion-0.1.0.tgz",
+                         "dsh-openviking-memory-isolated":  "file:D:/antigravity_veido/book-companion/dist/dsh-openviking-memory-isolated-0.5.20.tgz",
+                         "dsh-im-book-isolated":  "file:D:/antigravity_veido/book-companion/dist/dsh-im-book-isolated-5.7.0-book.1.tgz",
+                         "dsh-host-probe":  "file:D:/antigravity_veido/book-companion/packages/host-probe",
+                         "dsh-book-host-check":  "file:D:/antigravity_veido/book-companion/packages/host-check"
+                     },
+    "dsh":  {
+                "profile":  {
+                                "bundles":  [
+                                                "@deepseek-ai/dsh-base",
+                                                "@deepseek-ai/dsh-web-app",
+                                                "dsh-openviking-memory-isolated",
+                                                "dsh-book-companion",
+                                                "dsh-host-probe",
+                                                "dsh-book-host-check"
+                                            ]
+                            }
+            }
+}

@@ -1,0 +1,148 @@
+{
+  "ok": true,
+  "at": "2026-10-28T17:02:26.431Z",
+  "profile": "booktest",
+  "hostPid": 16760,
+  "node": "v24.18.1",
+  "modelSelection": {
+    "provider": "fake-gateway",
+    "model": "fake-model"
+  },
+  "bookSessionId": "session-ed5bbd36-b8a6-4dd5-8fbe-01f1f71af364",
+  "mainSessionId": "session-d54e9d23-8e96-4aa4-9d9c-b961b211cbf9",
+  "modelRequests": {
+    "book": 3,
+    "main": 1,
+    "total": 6
+  },
+  "checks": [
+    {
+      "name": "preset resolves to book-companion",
+      "pass": true,
+      "detail": "book-companion"
+    },
+    {
+      "name": "book session header.agentPreset is book-companion",
+      "pass": true,
+      "detail": "book-companion"
+    },
+    {
+      "name": "main comparison session is not book-companion",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "book model requests observed",
+      "pass": true,
+      "detail": 3
+    },
+    {
+      "name": "book system prompt contains companion persona",
+      "pass": true,
+      "detail": 231
+    },
+    {
+      "name": "book system prompt excludes MAIN_PERSONA_SENTINEL",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "book tool surface is exactly the six companion tools",
+      "pass": true,
+      "detail": [
+        "book_episode",
+        "book_forget",
+        "book_import_transcript",
+        "book_recall",
+        "book_remember",
+        "book_review"
+      ]
+    },
+    {
+      "name": "decision 1 is book_remember",
+      "pass": true,
+      "detail": {
+        "kind": "tool",
+        "name": "book_remember",
+        "args": "{\"kind\":\"material\",\"text\":\"《史记·项羽本纪》测试材料：项王军壁垓下，兵少食尽；于是项王乃悲歌慷慨。\",\"source\":\"fixture:史记/项羽本纪\"}"
+      }
+    },
+    {
+      "name": "decision 2 is book_recall",
+      "pass": true,
+      "detail": {
+        "kind": "tool",
+        "name": "book_recall",
+        "args": "{\"query\":\"史记\"}"
+      }
+    },
+    {
+      "name": "decision 3 is final text with ROUNDTRIP_OK",
+      "pass": true,
+      "detail": {
+        "kind": "text",
+        "text": "ROUNDTRIP_OK [{\"id\":\"14576e97-d3c5-4ec4-b68b-00f5b2ffde74\",\"session_id\":\"session-ed5bbd36-b8a6-4dd5-8fbe-01f1f71af364\",\"kind\":\"material\",\"text\":\"《史记·项羽本纪》测试材料：项王军壁垓下，兵少食尽；于是项王乃悲歌慷慨。\",\"source\":\"fixture:史记/项羽本纪\",\"created_at\":\"2026-10-28T17:02:23.138Z\"},{\"id\":\"0d6b8d758ccc6bdf9c99b855bbc6bf5270e1c09449c6bbf0cd615bb"
+      }
+    },
+    {
+      "name": "tool result returned to the model",
+      "pass": true,
+      "detail": [
+        "system",
+        "user",
+        "user",
+        "assistant",
+        "tool",
+        "assistant",
+        "tool"
+      ]
+    },
+    {
+      "name": "main session prompt carries MAIN_PERSONA_SENTINEL",
+      "pass": true,
+      "detail": 1
+    },
+    {
+      "name": "book assistant final answer observed",
+      "pass": true,
+      "detail": 3
+    },
+    {
+      "name": "book session persisted as JSONL",
+      "pass": true,
+      "detail": "C:\\Users\\xiale\\.dsh\\sessions\\--D-DSH-shutong--\\session-ed5bbd36-b8a6-4dd5-8fbe-01f1f71af364\\session.v4.jsonl.zstd"
+    },
+    {
+      "name": "main session persisted as JSONL",
+      "pass": true,
+      "detail": "C:\\Users\\xiale\\.dsh\\sessions\\--D-DSH-shutong--\\session-d54e9d23-8e96-4aa4-9d9c-b961b211cbf9\\session.v4.jsonl.zstd"
+    },
+    {
+      "name": "persisted book session header records book-companion",
+      "pass": true,
+      "detail": {
+        "type": "session",
+        "version": 4,
+        "id": "session-ed5bbd36-b8a6-4dd5-8fbe-01f1f71af364",
+        "createdAt": 1793206942959,
+        "cwd": "D:/DSH/shutong",
+        "isSeeded": false,
+        "delegationDepth": 0,
+        "agentPreset": "book-companion"
+      }
+    },
+    {
+      "name": "persisted main session header records no book preset",
+      "pass": true,
+      "detail": {
+        "type": "session",
+        "version": 4,
+        "id": "session-d54e9d23-8e96-4aa4-9d9c-b961b211cbf9",
+        "createdAt": 1793206943212,
+        "cwd": "D:/DSH/shutong",
+        "isSeeded": false,
+        "delegationDepth": 0
+      }
+    }
+  ]
+}

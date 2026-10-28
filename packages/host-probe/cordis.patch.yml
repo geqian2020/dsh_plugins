@@ -1,0 +1,3 @@
+- insert:
+    - id: host-probe
+      name: dsh-host-probe

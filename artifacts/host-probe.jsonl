@@ -1,0 +1,3 @@
+{"at":"2026-10-28T17:02:22.411Z","event":"probe-loaded","pid":16760}
+{"at":"2026-10-28T17:02:23.002Z","event":"agent/created","sessionId":"session-ed5bbd36-b8a6-4dd5-8fbe-01f1f71af364","agentPreset":"book-companion","cwd":"D:/DSH/shutong","origin":null}
+{"at":"2026-10-28T17:02:23.219Z","event":"agent/created","sessionId":"session-d54e9d23-8e96-4aa4-9d9c-b961b211cbf9","agentPreset":null,"cwd":"D:/DSH/shutong","origin":null}

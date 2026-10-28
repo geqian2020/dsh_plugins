@@ -1,0 +1,10 @@
+{
+  "upstream": {
+    "type": "git",
+    "url": "git+https://github.com/volcengine/OpenViking.git",
+    "directory": "examples/dsh-memory-plugin"
+  },
+  "version": "0.5.20",
+  "originalIndexSha256": "978fbd69c39774ac8a467ac2780743ea6bd6117a2e4e270462e8c6aa0f4bd766",
+  "patchedIndexSha256": "6fc4181d5c66eec07cc6eb31a1e1d33761f0340ae9cfe64bba3f7e2291351f12"
+}

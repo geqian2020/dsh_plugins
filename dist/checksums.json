@@ -1,0 +1,17 @@
+[
+  {
+    "file": "dsh-book-companion-0.1.0.tgz",
+    "bytes": 5815,
+    "sha256": "379f1e0c0a705e16de23f223dee1aaf47028ab4fac1807f822362598224919b6"
+  },
+  {
+    "file": "dsh-openviking-memory-isolated-0.5.20.tgz",
+    "bytes": 102151,
+    "sha256": "5a3d3b356bf93b348d45045a828e49007339eb4c2db53302785cb56a26c8f96d"
+  },
+  {
+    "file": "dsh-im-book-isolated-5.7.0-book.1.tgz",
+    "bytes": 11818626,
+    "sha256": "28fca0f7e07b751f831050014f74d8961b426d7d08cea4155c71f1b89c11976a"
+  }
+]

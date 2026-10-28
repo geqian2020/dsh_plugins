@@ -1,0 +1,4 @@
+* text=auto eol=lf
+*.zstd binary
+*.tgz binary
+*.sqlite binary
