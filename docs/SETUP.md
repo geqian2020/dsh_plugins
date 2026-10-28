@@ -149,7 +149,21 @@ $r = Get-Content artifacts/host-check.json -Raw | ConvertFrom-Json
 5. **profile 里不要放凭据**：`FAKE_LLM_KEY` 用环境变量注入；QQ / OpenViking 凭据只进
    DSH 本地凭据管理，不进仓库、不进聊天记录。
 
-## 6. 清理
+## 6. 发布到 GitHub（git 协议被拦截时的替代路径）
+
+某些受限网络只放行 `api.github.com`、不放行 `github.com`，`git push` 会直接失败。
+这时用 `scripts/publish-github.mjs` 走 Git Data API：
+
+```powershell
+gh auth login --hostname github.com --git-protocol https --web
+node scripts/publish-github.mjs --owner <owner> --repo book-companion --private --description "小书童"
+```
+
+脚本会：建仓库（若不存在）→ 按 HEAD 树逐个建 blob（base64，回读 sha 与本地 git 对象比对）→
+建 tree → 建 commit → 建 `refs/heads/main` → 把默认分支设为 main → 回读远端树逐文件校验。
+本地校验可先跑 `--dry-run`。
+
+## 7. 清理
 
 ```powershell
 Get-Process node | Where-Object { $_.Path -like '*primary-runtime*' } | Stop-Process
