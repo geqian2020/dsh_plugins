@@ -124,31 +124,45 @@ const workers = Array.from({ length: concurrency }, async () => {
 });
 await Promise.all(workers);
 
-// 4) 建 tree
+// 4) 取远端当前 head（仓库可能已有 Initial commit）
+let parent = null;
+let baseTree;
+try {
+  const ref = await call('GET', `${repoUrl}/git/ref/heads/main`);
+  parent = ref.object.sha;
+  baseTree = (await call('GET', `${repoUrl}/git/commits/${parent}`)).tree.sha;
+  console.log(`parent ${parent}`);
+} catch (error) {
+  if (error.status !== 404 && error.status !== 409) throw error;
+}
+
+// 5) 建 tree：有父提交就基于父树，未覆盖的文件保持原样
 const tree = entries.map((entry) => ({
   path: entry.file,
   mode: '100644',
   type: 'blob',
   sha: uploaded.get(entry.file)
 }));
-const createdTree = await call('POST', `${repoUrl}/git/trees`, { tree });
+const createdTree = await call('POST', `${repoUrl}/git/trees`, {
+  ...(baseTree === undefined ? {} : { base_tree: baseTree }),
+  tree
+});
 console.log(`tree ${createdTree.sha}`);
 
-// 5) 建 commit（空仓库无父提交）
+// 6) 建 commit：接到远端 head 之后，不丢历史
 const message = git('log', '-1', '--pretty=%B');
 const commit = await call('POST', `${repoUrl}/git/commits`, {
   message,
   tree: createdTree.sha,
-  parents: []
+  parents: parent === null ? [] : [parent]
 });
 console.log(`commit ${commit.sha}`);
 
-// 6) 建/更新 ref，并把默认分支设为 main
-try {
+// 7) 建/更新 ref，并把默认分支设为 main
+if (parent === null) {
   await call('POST', `${repoUrl}/git/refs`, { ref: 'refs/heads/main', sha: commit.sha });
-} catch (error) {
-  if (error.status !== 422) throw error;
-  await call('PATCH', `${repoUrl}/git/refs/heads/main`, { sha: commit.sha, force: true });
+} else {
+  await call('PATCH', `${repoUrl}/git/refs/heads/main`, { sha: commit.sha });
 }
 await call('PATCH', repoUrl, { default_branch: 'main' });
 console.log(`pushed -> https://github.com/${owner}/${repo}`);
