@@ -15,14 +15,14 @@
 2. 阅读记忆和主记忆混在一起，画像被阅读内容污染；
 3. 接 QQ 后，任何会话都能触发主助手，入口收不住。
 
-小书童的做法是反过来：**先造一个受限的独立会话身份，再让它只带 6 个阅读工具**。
+小书童的做法是反过来：**先造一个受限的独立会话身份，再让它只带 7 个阅读工具**。
 
 ## 隔离模型（四层，逐层都有断言）
 
 | 层 | 机制 | 证据 |
 | --- | --- | --- |
 | 组合层 | `cordis.patch.yml` 把运行时挂在 `@deepseek-ai/dsh-agent-preset` 的 `book-companion` 预设内，不全局注册 | 会话 header `agentPreset=book-companion` |
-| 工具层 | `ctx.tools.guard` 拒绝一切非 `book_*` 调用；`agent/created` 时 `tools.restrict` 只放行 6 个工具 | 模型侧工具面恰好 6 个，无主记忆 / 文件 / 命令工具 |
+| 工具层 | `ctx.tools.guard` 拒绝一切非 `book_*` 调用；`agent/created` 时 `tools.restrict` 只放行 7 个工具 | 模型侧工具面恰好 7 个，无主记忆 / 文件 / 命令工具 |
 | 提示词层 | `systemPrompt.section({complete:true})` 整体替换系统提示词 | 书童 977 字符 vs 主会话 3049 字符，且不含 `MAIN_PERSONA_SENTINEL` |
 | 记忆层 | `dsh-openviking-memory-isolated` fork：按预设 / 工作目录跳过主记忆的画像注入、召回、捕获、提交与 flush，并拦截 `mcp__openviking__*` | 新增会话/重启后仍不注入主画像（见 `docs/ARCHITECTURE.md`） |
 
@@ -37,7 +37,7 @@
 | P0-2 | 真模型 + 沙盒 OpenViking | 🟡 真模型已通，OpenViking 仍阻塞 | `deepseek-flash` 跑通「写入 → 新会话召回」7/7；OpenViking 仍缺沙盒 endpoint/key |
 | P0-3 | QQ 真号 | ⏳ 阻塞 | 等待机器人凭据配置进测试 profile（不入仓库） |
 | P1-4 | `verify-all.mjs` 一条命令复现 | 🟢 可做 | 串起 12 + 79 + 7 项测试、真机开机、构建导入冒烟 |
-| P1-5 | 产品最小闭环 | ⏸ 待 2/3 | 文章/播客转写 → 分段 → 记住 → 回顾（音频/ASR 后置） |
+| P1-5 | 产品最小闭环 | 🟡 播客链路已通 | 链接→下载→转写→分段入库→知识库笔记；文章导入与端到端回顾待补 |
 | P2 | 主动陪读、定时推送、推荐、记忆管理 UI | ⏸ | — |
 | P3 | 上线：替换主记忆 bundle、备份回滚、7 天试用 | ⏸ | 不允许两套 bundle 同时监听同一会话 |
 
@@ -52,13 +52,14 @@
 - 主记忆 0.5.20 的可重建补丁：排除画像注入 / 召回 / 捕获 / 提交 / flush；
 - 专属目录中的非书童会话被拒绝运行（防分叉丢预设）；
 - 小宇宙标题/简介读取（明确标注 metadata-only）、转写文本导入与分段、按时间范围回顾；
+- 播客单集：链接 → 下载音频 → 本地 faster-whisper 转写 → 分段入库 + 知识库笔记（`<vault>/dsh/podcasts`）；
 - QQ 补丁：固定预设与工作目录、绑定持久化、拒绝跨会话命令与入口切换；语音优先用平台 ASR 文本。
 
 **已证实的真机行为**（`artifacts/host-check.json`，17/17）
 
 - 首条消息前 header 已带 `agentPreset: book-companion`；
 - 主对照会话（3049 字符）带 `MAIN_PERSONA_SENTINEL`，书童（977 字符）不带——隔离不是「没注入」造成的假阴性；
-- 工具面恰好 6 个 `book_*`；
+- 工具面恰好 7 个 `book_*`；
 - 假模型一轮内完成 `book_remember → book_recall → ROUNDTRIP_OK`，工具结果以 `tool` 角色回传；
 - 会话落盘 `session.v4.jsonl.zstd`，header 记录预设。
 
@@ -68,7 +69,7 @@
 - **换一个全新会话**，只给一句「我们之前记过一个暗号」，模型先 `book_recall` 再答，取回了正确内容；
 - 两次会话 header 都是 `book-companion`，无错误事件。
 
-> 这只证明「真模型会用这 6 个工具、记忆能跨会话取回」，不等于陪读质量、延迟与费用已评估。
+> 这只证明「真模型会用这 7 个工具、记忆能跨会话取回」，不等于陪读质量、延迟与费用已评估。
 
 **未验证**
 
@@ -96,7 +97,7 @@ dsh booktest --no-open --port 19399
 ## 目录
 
 ```
-packages/book-companion/     书童插件：preset、6 个工具、persona、SQLite 记忆
+packages/book-companion/     书童插件：preset、7 个工具、persona、SQLite 记忆
 packages/openviking-memory-isolated/  主记忆隔离 fork（生成物，不入库）
 packages/host-probe/         宿主探针：注入主画像哨兵、记录 agent 事件
 packages/host-check/         开机自检：建会话、断言、写 artifact、退出码
@@ -108,6 +109,20 @@ profile/booktest/            测试 profile 的组合与配置（不含凭据）
 artifacts/                   本次真机验证的证据（报告 + 原始请求日志）
 docs/                        架构、验证、环境搭建
 ```
+
+## 知识库落盘（Obsidian）
+
+转写与笔记写到 `~/Documents/ObsidianVault/dsh/`（`BOOK_KB_ROOT` 可覆盖）：
+
+| 目录 | 内容 |
+| --- | --- |
+| `podcasts/` | 播客转写，`YYYY-MM-DD-标题.md`，带来源与覆盖范围 |
+| `reading/` | 文章、书摘、材料笔记 |
+| `reviews/` | 周/月回顾 |
+| `inbox/` | 待归类 |
+
+**它不是活库**：活库是 SQLite，删掉笔记不会让书童失忆。转写引擎复用 hermes 的 faster-whisper；
+相关路径可用 `BOOK_ASR_PYTHON`、`BOOK_ASR_SCRIPT`、`BOOK_FFMPEG` 覆盖。
 
 ## 证据
 

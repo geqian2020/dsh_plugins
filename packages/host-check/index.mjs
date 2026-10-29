@@ -182,7 +182,7 @@ export function apply(ctx, config = {}) {
       check('book system prompt contains companion persona', String(firstBook.systemPrompt).includes('阅读搭子'), firstBook.systemPromptChars);
       check('book system prompt excludes MAIN_PERSONA_SENTINEL', !String(firstBook.systemPrompt).includes('MAIN_PERSONA_SENTINEL'), null);
       const toolNames = (firstBook.toolNames ?? []).slice().sort();
-      const expected = ['book_episode', 'book_forget', 'book_import_transcript', 'book_recall', 'book_remember', 'book_review'];
+      const expected = ['book_episode', 'book_forget', 'book_import_transcript', 'book_recall', 'book_remember', 'book_review', 'book_transcribe'];
       check('book tool surface is exactly the six companion tools', JSON.stringify(toolNames) === JSON.stringify(expected), toolNames);
       const decisions = bookRequests.map((entry) => entry.decision);
       check('decision 1 is book_remember', decisions[0]?.kind === 'tool' && decisions[0]?.name === 'book_remember', decisions[0] ?? null);

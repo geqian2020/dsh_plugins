@@ -1,11 +1,14 @@
 import { defineTool } from '@deepseek-ai/dsh-tools';
 import { BookStore } from './src/store.mjs';
 import {fetchEpisode,segmentTranscript} from './src/materials.mjs';
+import { transcribeEpisode } from './src/podcast.mjs';
 import { PRESET, requireBook } from './src/isolation.mjs';
 import { homedir } from 'node:os';
 import path from 'node:path';
 export const name='book-companion';
 export const inject=['agents','tools','systemPrompt','bookMemoryIsolation'];
+const KB_ROOT = process.env.BOOK_KB_ROOT ?? path.join(homedir(), 'Documents', 'ObsidianVault', 'dsh');
+
 export function apply(ctx,config={}) {
   const isolation=ctx.get('bookMemoryIsolation');
   if(isolation?.version!==1||!isolation.excludes({header:{agentPreset:PRESET}}))throw new Error('Verified main-memory exclusion is required before book companion can start');
@@ -38,7 +41,8 @@ export function apply(ctx,config={}) {
 - book_remember：一次记一件事，不要把三条信息塞进一条。
 - book_recall：query 用 2-4 个关键词，不要整句；用户提到「上次/之前/我们聊过」时先查再答；查不到就直说没记过。
 - book_forget：只删用户点名的那条，删完回一句确认。
-- book_episode：只返回标题和简介，status 是 metadata-only；这不等于你听过，必须明说「我只看到简介，没听音频」。
+- book_episode：只返回标题和简介，status 是 metadata-only；它不等于你听过，只看到简介就明说。
+- book_transcribe：用户发小宇宙单集链接时先用它下载并转写；成功后再讨论，失败就说「没听到音频」。转写会有错，引用时注明「据转写」。
 - book_import_transcript：用户提供转写文本时才用；分段入库后，引用要带 segment 出处。
 - book_review：用户问「这周/最近读了什么」时用；since、until 传 ISO 时间。
 
@@ -55,11 +59,20 @@ export function apply(ctx,config={}) {
   register('book_episode','读取小宇宙节目的标题和简介；结果不等于完整转写，不能据此声称听过。',{url:{type:'string',required:true}},(args,exec)=>fetchEpisode(args.url,{signal:exec.signal}));
   register('book_import_transcript','导入用户提供或已完成识别的转写，按段保存出处。不得把简介冒充转写。',{text:{type:'string',required:true},source:{type:'string',required:true}},(args,exec)=>store.importTranscript(exec.agent,segmentTranscript(args)));
   register('book_review','读取指定时间范围的阅读记录，依据原话回顾并区分用户与助手观点。',{since:{type:'string',required:true},until:{type:'string',required:true}},(args,exec)=>store.review(exec.agent,args));
+  register('book_transcribe','下载小宇宙单集音频并用本地 faster-whisper 转写；转写文本写入知识库 dsh/podcasts 并按段入库。转写会有识别错误，引用时必须注明「据转写」。',{url:{type:'string',required:true}},(args,exec)=>transcribeEpisode({
+    url: args.url,
+    store,
+    agent: exec.agent,
+    dataDir,
+    kbRoot: config.kbRoot ?? KB_ROOT,
+    model: config.asrModel ?? 'small',
+    signal: exec.signal
+  }));
   const restricted=new WeakSet();
   ctx.on('agent/created',({agent})=>{
     if(agent.session.header.agentPreset!==PRESET)throw new Error('Book plugin bound to wrong preset');
     if(!restricted.has(agent)){
-      agent.ctx.tools.restrict({allow:['book_remember','book_recall','book_forget','book_episode','book_import_transcript','book_review']});
+      agent.ctx.tools.restrict({allow:['book_remember','book_recall','book_forget','book_episode','book_import_transcript','book_review','book_transcribe']});
       restricted.add(agent);
     }
   });

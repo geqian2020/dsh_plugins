@@ -32,9 +32,9 @@ if (isolation?.version !== 1 || !isolation.excludes({ header: { agentPreset: PRE
 也就是说：**没有装隔离版主记忆，书童拒绝启动**。这是一个 fail-closed 设计，
 避免「忘了装补丁，书童静默共享主记忆」这种最难发现的故障。
 
-## 2. 工具面：6 个工具，双保险
+## 2. 工具面：7 个工具，双保险
 
-书童只有六个工具：
+书童只有七个工具：
 
 | 工具 | 作用 | 边界 |
 | --- | --- | --- |
@@ -44,6 +44,7 @@ if (isolation?.version !== 1 || !isolation.excludes({ header: { agentPreset: PRE
 | `book_episode` | 读取小宇宙节目标题与简介 | 只允许 canonical 链接，返回 `metadata-only` |
 | `book_import_transcript` | 导入转写并按段保存 | 1600 字一段，digest 去重，Savepoint 原子写入 |
 | `book_review` | 按时间范围回顾 | 200 条上限，超限返回 `truncated: true` |
+| `book_transcribe` | 小宇宙单集下载 + 本地转写 + 落库 | 转写有错，引用必须注明「据转写」；长音频耗时 |
 
 双保险指的是：
 
@@ -51,7 +52,7 @@ if (isolation?.version !== 1 || !isolation.excludes({ header: { agentPreset: PRE
 2. **会话期 restrict**：`agent/created` 时对书童 agent 调 `ctx.tools.restrict({ allow: [...] })`，
    模型侧连工具定义都看不到别的。
 
-`ctx.tools.presentAs('native')` 让这六个工具以原生工具形式出现，而不是 MCP 代理。
+`ctx.tools.presentAs('native')` 让这七个工具以原生工具形式出现，而不是 MCP 代理。
 
 ## 3. 提示词：整体替换，而不是追加
 
@@ -111,6 +112,29 @@ return roots.some(root => 工作目录在 root 之内);
 - **自动留档**：监听 `session/event`，只收 `role` 为 user/assistant 的文本消息，
   且用户消息 `source.kind` 必须是 `user`——**注入的上下文不会被当成用户原话存下来**。
   记录 ID 是 `sha256("session:<id>/event:<seq>")`，天然幂等。
+
+### 4.3 播客：从链接到可引用的转写
+
+`book_transcribe` 把「我只看到简介」补成「我读过转写」，链路是：
+
+```
+小宇宙单集链接
+  → 抓页面（必须带浏览器 UA，Node 默认 UA 会被 403）
+  → 取 __NEXT_DATA__ 里的 enclosure.url
+  → 下载到 ~/.dsh/book-companion/audio/<sha1>.m4a
+  → 本地 faster-whisper 转写（HF_HUB_OFFLINE=1，否则会去连 HuggingFace 被代理拦成 502）
+  → 带时间戳的文本 → 按 1600 字分段
+  → SQLite material 行（source 带 #segment=N）
+  → 知识库笔记 <vault>/dsh/podcasts/YYYY-MM-DD-标题.md
+```
+
+复用关系：ASR 用 hermes 自带的 faster-whisper 环境和 `transcribe.py`；页面取 audioUrl 的思路来自 hermes 的
+`media/podcast-transcribe` 技能（它文档里的 FunASR 是 Linux + GPU 路径，本机没装，不适用）。
+
+边界：CPU + small 模型约为 0.5 倍实时（2 分钟音频约 70 秒，含模型加载）；50 分钟单集约 20 分钟。
+转写不是原文，引用时必须写「据转写」，不能当成逐字稿。
+
+知识库里的 `dsh/` **不是活库**：活库是 SQLite，删掉笔记不会让书童失忆，反过来也一样。
 
 ## 5. QQ 入口：把「入口」钉死
 

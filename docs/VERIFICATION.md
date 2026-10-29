@@ -38,7 +38,7 @@
 | 4 | 观测到书童模型请求 | PASS | 3 |
 | 5 | 书童提示词含「阅读搭子」人设 | PASS | 977 字符 |
 | 6 | 书童提示词**不含** `MAIN_PERSONA_SENTINEL` | PASS | — |
-| 7 | 工具面恰好 6 个 `book_*` | PASS | `book_episode / book_forget / book_import_transcript / book_recall / book_remember / book_review` |
+| 7 | 工具面恰好 7 个 `book_*` | PASS | `book_episode / book_forget / book_import_transcript / book_recall / book_remember / book_review / book_transcribe` |
 | 8 | 第 1 个决策是 `book_remember` | PASS | `{kind:"tool",name:"book_remember"}` |
 | 9 | 第 2 个决策是 `book_recall` | PASS | `{kind:"tool",name:"book_recall"}` |
 | 10 | 第 3 个决策是含 `ROUNDTRIP_OK` 的最终文本 | PASS | 文本内含刚写入的记录 JSON |
@@ -75,7 +75,7 @@
 
 ### 2. 工具面是硬的
 
-模型侧看到的工具名排序后精确等于六个 `book_*`，没有 `mcp__openviking__*`、没有文件工具、
+模型侧看到的工具名排序后精确等于七个 `book_*`，没有 `mcp__openviking__*`、没有文件工具、
 没有命令工具。第 7 条断言用的是 `JSON.stringify(sorted) === JSON.stringify(expected)`，
 不是 `includes`，多一个少一个都会失败。
 
@@ -114,6 +114,28 @@ dsh booktest --patch profile/booktest/real-model.patch.yml --no-open --port 1939
 
 **这只证明工具可用、记忆能跨会话取回**；陪读质量、延迟、费用仍未评估，也没有覆盖
 长时间对话、材料导入、回顾等场景。
+
+## 播客转写冒烟（2026-10-29）
+
+目标：把「只有简介」补成「有转写可引用」。用一期真实单集跑通下载 → 转写 → 入库 → 知识库笔记。
+
+| 项 | 结果 |
+| --- | --- |
+| 单集 | 《Vol.09 听说宫崎骏是极端feminist？》（小宇宙） |
+| 覆盖 | 前 180 秒（冒烟切片；完整版单独跑） |
+| 音频 | 26 MB m4a，下载约 6 秒 |
+| 转写 | 41 段、1211 字，约 103 秒（含模型加载） |
+| 入库 | `material` 行，`source = 标题 + URL + #segment=1` |
+| 知识库 | `Documents/ObsidianVault/dsh/podcasts/2026-10-29-Vol.09 ....md` |
+| 引擎 | hermes 自带 faster-whisper（`transcribe.py`），CPU int8，small 模型 |
+
+过程中修掉的两个真实故障：
+
+1. **Node 默认 UA 被 403**：小宇宙页面必须带浏览器 UA，否则 `fetchEpisode` 直接失败；
+2. **HuggingFace 联网校验被代理拦成 502**：模型已缓存，转写时必须 `HF_HUB_OFFLINE=1`，否则整条链路卡在模型加载。
+
+边界：CPU + small 约 0.5 倍实时（50 分钟单集约 20 分钟）；转写不是逐字稿，引用要注明「据转写」。
+完整单集的转写结果见 `dsh/podcasts/`（若已跑完）。
 
 ## 数字口径（重要）
 

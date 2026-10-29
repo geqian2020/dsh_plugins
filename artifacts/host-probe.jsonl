@@ -18,3 +18,9 @@
 {"at":"2026-10-29T06:32:03.072Z","event":"probe-loaded","pid":21368}
 {"at":"2026-10-29T06:32:03.856Z","event":"agent/created","sessionId":"session-0dcda6c4-0d05-4abc-9888-07d9b4ea3750","agentPreset":"book-companion","cwd":"D:/DSH/shutong","origin":null}
 {"at":"2026-10-29T06:32:04.374Z","event":"agent/created","sessionId":"session-db34190e-54f1-47d0-a02b-3c75eed8f33e","agentPreset":null,"cwd":"D:/DSH/shutong","origin":null}
+{"at":"2026-10-29T08:46:02.892Z","event":"probe-loaded","pid":10636}
+{"at":"2026-10-29T08:46:03.931Z","event":"agent/created","sessionId":"session-5220bbfd-10cb-474d-8596-9b46ef5debe2","agentPreset":"book-companion","cwd":"D:/DSH/shutong","origin":null}
+{"at":"2026-10-29T08:46:04.934Z","event":"agent/created","sessionId":"session-e998c075-0e95-462e-9709-c409fcb2886a","agentPreset":null,"cwd":"D:/DSH/shutong","origin":null}
+{"at":"2026-10-29T08:47:28.753Z","event":"probe-loaded","pid":4448}
+{"at":"2026-10-29T08:47:29.557Z","event":"agent/created","sessionId":"session-6d6e1922-76b6-4a67-8d19-fc0b3a63c18a","agentPreset":"book-companion","cwd":"D:/DSH/shutong","origin":null}
+{"at":"2026-10-29T08:47:31.716Z","event":"agent/created","sessionId":"session-d19913f5-e2b9-40cc-9635-d0c964475a38","agentPreset":"book-companion","cwd":"D:/DSH/shutong","origin":null}

@@ -48,7 +48,7 @@ P3   上线关卡：替换主记忆 bundle、备份回滚、7 天真实试用评
 - **验收（已达成，17/17 PASS；以 `artifacts/host-check.json` 为准，早期摘要误记为 18/18）**：
   - 首条消息前 header `agentPreset=book-companion`；
   - 书童系统提示词有人设、**无**主画像哨兵（主对照会话有，证明隔离真实生效）；
-  - 工具面恰好 6 个 `book_*`；
+  - 工具面恰好 7 个 `book_*`；
   - `book_remember → book_recall → 最终回答` 链路通，工具结果回传模型；
   - 会话落盘 `session.v4.jsonl.zstd`，header 正确。
 - **证据**：`artifacts/host-boot-evidence.md`、`artifacts/host-check.json`、`artifacts/fake-llm.jsonl`、`artifacts/host-probe.jsonl`。

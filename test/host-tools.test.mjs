@@ -33,7 +33,7 @@ test('installed DSH tool registry enforces bidirectional visibility and executio
   const bookPrompt=renderPrompt(await ctx.systemPrompt.assemble({scope:book}));
   assert.match(bookPrompt,/阅读搭子/);assert.equal(bookPrompt.includes('MAIN_PERSONA_SENTINEL'),false);
   assert.equal(renderPrompt(await ctx.systemPrompt.assemble({scope:main})).includes('MAIN_PERSONA_SENTINEL'),true);
-  assert.deepEqual(ctx.tools.schemas(book).map(x=>x.name).sort(),['book_episode','book_forget','book_import_transcript','book_recall','book_remember','book_review']);
+  assert.deepEqual(ctx.tools.schemas(book).map(x=>x.name).sort(),['book_episode','book_forget','book_import_transcript','book_recall','book_remember','book_review','book_transcribe']);
   assert.deepEqual(ctx.tools.schemas(main).map(x=>x.name),['mcp__openviking__remember']);
   const call=(agent,name,args={})=>ctx.tools.execute({agent,name,arguments:args,callId:Math.random().toString(),signal:new AbortController().signal});
   assert.equal((await call(book,'mcp__openviking__remember')).isError,true);

@@ -1,4 +1,6 @@
 import {createHash} from 'node:crypto';
+const BROWSER_UA='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36';
+export const EPISODE_HEADERS={'user-agent':BROWSER_UA,'accept-language':'zh-CN,zh;q=0.9'};
 export function episodeUrl(value){
  const u=new URL(value);
  if(u.protocol!=='https:'||u.hostname!=='www.xiaoyuzhoufm.com'||u.port||u.username||u.password||!/^\/episode\/[a-f\d]{24}\/?$/i.test(u.pathname))throw new Error('Only canonical Xiaoyuzhou episode links are supported');
@@ -13,7 +15,7 @@ export function extractEpisode(html,url){
 }
 export async function fetchEpisode(url,{fetchImpl=fetch,signal}={}){
  const canonical=episodeUrl(url);
- const res=await fetchImpl(canonical,{redirect:'error',signal:AbortSignal.any([AbortSignal.timeout(20000),...(signal?[signal]:[])])});
+ const res=await fetchImpl(canonical,{redirect:'error',headers:EPISODE_HEADERS,signal:AbortSignal.any([AbortSignal.timeout(20000),...(signal?[signal]:[])])});
  if(!res.ok)throw new Error(`Episode fetch failed (${res.status})`);
  const chunks=[];let size=0;
  for await(const chunk of res.body){size+=chunk.length;if(size>4*1024*1024){await res.body.cancel?.().catch(()=>{});throw new Error('Episode page too large');}chunks.push(chunk);}
