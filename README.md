@@ -45,7 +45,7 @@
 
 ## 已实现 / 已验证 / 未验证
 
-**已实现并有测试**（`node --test`，12 项通过）
+**已实现并有测试**（`node --test`，13 项通过）
 
 - 预设、独立 system prompt、会话级工具允许列表与执行授权；
 - 独立 SQLite 阅读记忆，保留来源与作者类别，对话自动留档并过滤注入上下文；
@@ -103,7 +103,7 @@ packages/host-probe/         宿主探针：注入主画像哨兵、记录 agent
 packages/host-check/         开机自检：建会话、断言、写 artifact、退出码
 src/                         共享源码（isolation / store / materials）
 scripts/                     构建、打补丁、假网关、验证、打包
-test/                        12 项单元/回归测试
+test/                        13 项单元/回归测试
 patches/dsh-im/              QQ 路由与语音文本补丁
 profile/booktest/            测试 profile 的组合与配置（不含凭据）
 artifacts/                   本次真机验证的证据（报告 + 原始请求日志）
@@ -133,7 +133,7 @@ docs/                        架构、验证、环境搭建
 | [artifacts/fake-llm.jsonl](artifacts/fake-llm.jsonl) | 模型实际收到的 system prompt、tools、消息角色序列 |
 | [artifacts/host-probe.jsonl](artifacts/host-probe.jsonl) | 宿主探针事件流 |
 | [artifacts/host-smoke.json](artifacts/host-smoke.json) | 真模型冒烟：写入 + 跨会话召回的 7 条断言 |
-| [artifacts/verification.json](artifacts/verification.json) | 12 项测试报告与未验证清单 |
+| [artifacts/verification.json](artifacts/verification.json) | 13 项测试报告与未验证清单 |
 | [artifacts/im-verification.json](artifacts/im-verification.json) | QQ 回归 79 项 + 状态恢复 7 项 |
 
 ## 边界与安全

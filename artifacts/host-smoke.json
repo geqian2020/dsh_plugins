@@ -1,16 +1,16 @@
 {
   "ok": true,
   "mode": "real",
-  "at": "2026-10-29T08:47:35.689Z",
+  "at": "2026-10-29T08:56:09.030Z",
   "profile": "booktest",
-  "hostPid": 4448,
+  "hostPid": 2660,
   "node": "v24.18.1",
   "modelSelection": {
     "provider": "deepseek-official",
     "model": "deepseek-flash"
   },
-  "writeSessionId": "session-6d6e1922-76b6-4a67-8d19-fc0b3a63c18a",
-  "recallSessionId": "session-d19913f5-e2b9-40cc-9635-d0c964475a38",
+  "writeSessionId": "session-b4d563a7-3dc6-491f-8753-948d8c2bd47b",
+  "recallSessionId": "session-fb87d7bc-2fca-438e-835b-1d65b19b61c2",
   "secret": "SMOKE_SECRET_青鸾-7391",
   "checks": [
     {
@@ -28,18 +28,18 @@
       "pass": true,
       "detail": {
         "secret": "SMOKE_SECRET_青鸾-7391",
-        "rememberedRows": 3
+        "rememberedRows": 4
       }
     },
     {
       "name": "recall happens in a different session",
       "pass": true,
-      "detail": "session-d19913f5-e2b9-40cc-9635-d0c964475a38"
+      "detail": "session-fb87d7bc-2fca-438e-835b-1d65b19b61c2"
     },
     {
       "name": "book_recall called in the recall session",
       "pass": true,
-      "detail": 19752
+      "detail": 20830
     },
     {
       "name": "cross-session recall returned the secret",
