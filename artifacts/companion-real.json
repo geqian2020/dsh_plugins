@@ -1,0 +1,55 @@
+{
+  "ok": true,
+  "mode": "real",
+  "at": "2026-10-29T15:24:44.392Z",
+  "profile": "booktest",
+  "hostPid": 21324,
+  "node": "v24.21.0",
+  "modelSelection": {
+    "provider": "deepseek-official",
+    "model": "deepseek-flash"
+  },
+  "writeSessionId": "session-c37625e3-c4fb-471c-a5c0-a8133929b34e",
+  "recallSessionId": "session-267b2311-5d94-4d24-8fa9-8f60639a2353",
+  "secret": "SMOKE_book-companion-check-N1fGCP",
+  "checks": [
+    {
+      "name": "preset resolves to book-companion",
+      "pass": true,
+      "detail": "book-companion"
+    },
+    {
+      "name": "write session header.agentPreset is book-companion",
+      "pass": true,
+      "detail": "book-companion"
+    },
+    {
+      "name": "book_remember wrote a row with source smoke-test",
+      "pass": true,
+      "detail": {
+        "secret": "SMOKE_book-companion-check-N1fGCP",
+        "rememberedRows": 1
+      }
+    },
+    {
+      "name": "recall happens in a different session",
+      "pass": true,
+      "detail": "session-267b2311-5d94-4d24-8fa9-8f60639a2353"
+    },
+    {
+      "name": "book_recall called in the recall session",
+      "pass": true,
+      "detail": 14794
+    },
+    {
+      "name": "cross-session recall returned the secret",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "no error events",
+      "pass": true,
+      "detail": 0
+    }
+  ]
+}

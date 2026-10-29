@@ -1,0 +1,37 @@
+{
+  "at": "2026-10-29T15:25:07.986Z",
+  "ok": true,
+  "profile": "booktest",
+  "launch": "Installed bundled Node and CLI extracted from the installed DSH archive",
+  "isolatedTestData": true,
+  "runDir": "C:\\Users\\xiale\\AppData\\Local\\Temp\\book-companion-check-N1fGCP",
+  "results": [
+    {
+      "mode": "fake",
+      "ok": true,
+      "pass": 17,
+      "total": 17,
+      "report": "companion-fake.json"
+    },
+    {
+      "mode": "real",
+      "ok": true,
+      "pass": 7,
+      "total": 7,
+      "report": "companion-real.json"
+    },
+    {
+      "mode": "exploration-real",
+      "ok": true,
+      "pass": 10,
+      "total": 10,
+      "report": "companion-exploration-real.json"
+    }
+  ],
+  "notVerified": [
+    "Real OpenViking network audit",
+    "QQ proactive delivery",
+    "External feed availability and recommendation quality",
+    "Seven-day user experience"
+  ]
+}

@@ -1,7 +1,33 @@
 # 小书童（book-companion）
 
+## 0.2.0：持续阅读搭子
+
+书童可以讨论个人经历与感受，不再机械地把话题拉回书本。它能保留自己的阅读兴趣和观点，不以用户认可作为保存前提；通过共同问题记录双方分歧，留待新材料继续讨论。
+
+新增 `book_discover`（RSS/Atom 候选）、`book_read_article`（正文提取与分段入库）、`book_thread`（双方观点与待续问题）。工具合同统一放在 `src/contract.mjs`，目前共十个专属工具。
+
+可选后台阅读在会话空闲时，从配置来源找与待续问题相关的材料，先读正文，再续接 DSH 会话。默认关闭；每日限额、安静时段和持久化去重已经实现。尚不保证 QQ 主动投递，长播客转写仍同步。
+
+用法、配置及边界见 [docs/COMPANION.md](docs/COMPANION.md)，最新运行证据见 [docs/COMPANION-VERIFICATION.md](docs/COMPANION-VERIFICATION.md)。本轮仅更新 booktest，未接正式 desktop。测试使用临时数据库，不写入实际阅读库。
+
+```powershell
+node scripts/sync-book.mjs
+node scripts/verify.mjs
+node scripts/pack.mjs
+node scripts/install-booktest.mjs
+node scripts/check-companion.mjs --real
+```
+
+`--real` 使用本地模型凭据，自动运行假模型宿主检查、真模型记忆冒烟和探索陪读。探索材料为明确标注的虚构 RSS/HTML；能证明工具与讨论链路，不代表外部来源可用或陪伴质量已经达标。
+
+正文依赖 Mozilla Readability、linkedom；RSS/Atom 依赖 saxes。没有引入 B 站评论或发帖能力。发布脚本现采用普通 Git 推送，保留远端历史。
+
+---
+
+以下保留 **0.1.x 历史基线记录**。其中工具数量、测试数和未完成项描述以本节及最新验收文档为准。
+
 一个挂在 **DSH（DeepSeek Harness）** 上的阅读搭子：**独立人设 + 独立记忆**，与主助手物理隔离。
-不是通用助手，只做阅读、讨论、纠错、回顾。
+旧版定位为阅读、讨论、纠错、回顾；0.2.0 已扩展主动探索和持续交流。
 
 > 当前阶段：**P0-1 真机开机 17/17**，**P0-2 真模型 7/7**（`deepseek-flash` 写入 + 跨会话召回）；
 > OpenViking 沙盒与 QQ 真号仍在等待外部凭据。

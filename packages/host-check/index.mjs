@@ -5,6 +5,8 @@ import path from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { DatabaseSync } from 'node:sqlite';
 import { createUserMessage } from '@deepseek-ai/dsh-llm';
+import {BOOK_TOOL_NAMES} from 'dsh-book-companion';
+import {BookStore} from 'dsh-book-companion/src/store.mjs';
 
 export const name = 'book-host-check';
 export const inject = ['agents', 'sessions', 'agentDefaultModel', 'agentPresets'];
@@ -16,10 +18,10 @@ const write = (file, value) => {
 };
 const appendLog = (line) => {
   fs.mkdirSync(ART, { recursive: true });
-  fs.appendFileSync(path.join(ART, 'host-check.log'), line + '\n');
+  fs.appendFileSync(process.env.BOOK_HOST_CHECK_LOG ?? path.join(ART, 'host-check.log'), line + '\n');
 };
 const readRequests = () => {
-  const file = path.join(ART, 'fake-llm.jsonl');
+  const file = process.env.FAKE_LLM_LOG ?? path.join(ART, 'fake-llm.jsonl');
   if (!fs.existsSync(file)) return [];
   return fs.readFileSync(file, 'utf8').split('\n').filter(Boolean).map((line) => {
     try { return JSON.parse(line); } catch { return null; }
@@ -56,7 +58,7 @@ const readPersistedHeader = (file) => {
   }
 };
 
-const bookDbPath = () => path.join(process.env.DSH_HOME ?? path.join(os.homedir(), '.dsh'), 'book-companion', 'reading.sqlite');
+const bookDbPath = () => path.join(process.env.BOOK_TEST_DATA_DIR ?? path.join(process.env.DSH_HOME ?? path.join(os.homedir(), '.dsh'), 'book-companion'), 'reading.sqlite');
 const countNotes = (needle) => {
   try {
     const db = new DatabaseSync(bookDbPath(), { readOnly: true });
@@ -118,6 +120,33 @@ export function apply(ctx, config = {}) {
     };
 
     const bookSessionId = 'session-' + randomUUID();
+
+    if(config.mode==='exploration-real'){
+      const store=new BookStore(bookDbPath());
+      const seedAgent={session:{header:{id:'fixture-seed',agentPreset:'book-companion'}}};
+      const thread=store.thread(seedAgent,{action:'save',question:'性格 组织 制度',userView:'我目前觉得人物的选择主要由性格决定。',assistantView:'我更想检验组织和信息流能否提供另一种解释，暂时保留分歧。',evidence:'fixture:earlier-reading-conversation'});
+      store.close();
+      const run=await drive(bookSessionId,'book-companion','我们以前聊过一个还没解决的问题。请先找回它，然后自己从配置的订阅源选择相关材料并读取正文，给我一个有来源的新视角和你真正想继续讨论的问题。把你的判断和我们仍然存在的分歧保存下来；不要替我改变立场。');
+      const toolNames=run.events.filter(e=>e.type==='tool/call').map(e=>e.data?.name);
+      const answers=run.events.filter(e=>e.type==='assistant/message').map(e=>e.data?.message?.content?.filter(p=>p.type==='text').map(p=>p.text).join('\n')??'').join('\n');
+      const after=new BookStore(bookDbPath());
+      const threads=after.thread(seedAgent,{action:'list'});
+      const savedViews=after.db.prepare("SELECT kind,source,text FROM notes WHERE kind='assistant-view'").all();
+      const materials=after.db.prepare("SELECT source FROM notes WHERE kind='material'").all();
+      after.close();
+      check('exploration session has book identity',run.header.agentPreset==='book-companion');
+      check('model retrieves a prior thread',toolNames.includes('book_thread'),toolNames);
+      check('model discovers material from configured sources',toolNames.includes('book_discover'));
+      check('model reads article body',toolNames.includes('book_read_article'));
+      check('article body is stored with source segments',materials.some(n=>n.source.startsWith('https://reading-fixture.example/article#segment=')),materials);
+      check('answer uses information only present in body',answers.includes('双向信使'),answers);
+      check('answer identifies its material source',/reading-fixture\.example|测试材料|虚构/.test(answers));
+      check('user position remains distinct',threads.some(t=>t.id===thread.id&&t.userView.includes('性格')&&t.assistantView.length>0),threads);
+      check('assistant saves its own view or revises the thread',savedViews.length>0||threads.some(t=>t.id===thread.id&&t.evidence!=='fixture:earlier-reading-conversation'),savedViews.map(v=>({kind:v.kind,source:v.source})));
+      check('no error events',!run.events.some(e=>String(e.type).includes('error')));
+      const report={ok:checks.every(c=>c.pass),mode:config.mode,at:new Date().toISOString(),profile:config.profileName??'booktest',modelSelection:selection,sessionId:bookSessionId,tools:toolNames,checks,sourceKind:'synthetic RSS and HTML via test-only transport; real DSH and real model',dataIsolated:!!process.env.BOOK_TEST_DATA_DIR};
+      write(config.reportFile??'companion-exploration-real.json',report);return report.ok;
+    }
 
     // 真模型模式：判据不是「假网关脚本返回了什么」，而是
     //   1) 书童的库里真的出现了 material 行（写路径）
@@ -182,8 +211,8 @@ export function apply(ctx, config = {}) {
       check('book system prompt contains companion persona', String(firstBook.systemPrompt).includes('阅读搭子'), firstBook.systemPromptChars);
       check('book system prompt excludes MAIN_PERSONA_SENTINEL', !String(firstBook.systemPrompt).includes('MAIN_PERSONA_SENTINEL'), null);
       const toolNames = (firstBook.toolNames ?? []).slice().sort();
-      const expected = ['book_episode', 'book_forget', 'book_import_transcript', 'book_recall', 'book_remember', 'book_review', 'book_transcribe'];
-      check('book tool surface is exactly the six companion tools', JSON.stringify(toolNames) === JSON.stringify(expected), toolNames);
+      const expected = BOOK_TOOL_NAMES;
+      check('book tool surface matches the companion contract', JSON.stringify(toolNames) === JSON.stringify(expected), toolNames);
       const decisions = bookRequests.map((entry) => entry.decision);
       check('decision 1 is book_remember', decisions[0]?.kind === 'tool' && decisions[0]?.name === 'book_remember', decisions[0] ?? null);
       check('decision 2 is book_recall', decisions[1]?.kind === 'tool' && decisions[1]?.name === 'book_recall', decisions[1] ?? null);

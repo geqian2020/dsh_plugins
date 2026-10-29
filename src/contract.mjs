@@ -1,0 +1,1 @@
+export const BOOK_TOOL_NAMES = Object.freeze(['book_episode','book_forget','book_import_transcript','book_recall','book_remember','book_review','book_transcribe','book_discover','book_read_article','book_thread'].sort());

@@ -1,7 +1,9 @@
 import fs from 'node:fs';
+import {installReadingFixture} from './reading-fixture.mjs';
 export const name = 'host-probe';
 export const inject = ['systemPrompt', 'agents'];
 export function apply(ctx, config = {}) {
+  if(config.readingFixture===true)installReadingFixture(ctx);
   const outFile = config.outFile ?? 'D:/antigravity_veido/book-companion/artifacts/host-probe.jsonl';
   const log = (record) => {
     try {

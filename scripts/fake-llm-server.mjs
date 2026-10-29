@@ -6,7 +6,7 @@ import path from 'node:path';
 
 const PORT = Number(process.env.FAKE_LLM_PORT ?? 19733);
 const ART = 'D:/antigravity_veido/book-companion/artifacts';
-const LOG = path.join(ART, 'fake-llm.jsonl');
+const LOG = process.env.FAKE_LLM_LOG ?? path.join(ART, 'fake-llm.jsonl');
 fs.mkdirSync(ART, { recursive: true });
 // 每次启动清空日志：否则 host-check 会读到上一轮的请求，把旧 prompt 长度当成这一轮的结论。
 fs.writeFileSync(LOG, '');

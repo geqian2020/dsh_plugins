@@ -1,0 +1,153 @@
+{
+  "ok": true,
+  "mode": "fake",
+  "at": "2026-10-29T15:24:35.164Z",
+  "profile": "booktest",
+  "hostPid": 11936,
+  "node": "v24.21.0",
+  "modelSelection": {
+    "provider": "fake-gateway",
+    "model": "fake-model"
+  },
+  "bookSessionId": "session-3f6fc6a3-24be-4a30-9e93-5ed91cf9af1b",
+  "mainSessionId": "session-3e34edac-6a1f-4d50-acb3-d261b199aaff",
+  "modelRequests": {
+    "book": 3,
+    "main": 1,
+    "total": 6
+  },
+  "checks": [
+    {
+      "name": "preset resolves to book-companion",
+      "pass": true,
+      "detail": "book-companion"
+    },
+    {
+      "name": "book session header.agentPreset is book-companion",
+      "pass": true,
+      "detail": "book-companion"
+    },
+    {
+      "name": "main comparison session is not book-companion",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "book model requests observed",
+      "pass": true,
+      "detail": 3
+    },
+    {
+      "name": "book system prompt contains companion persona",
+      "pass": true,
+      "detail": 1628
+    },
+    {
+      "name": "book system prompt excludes MAIN_PERSONA_SENTINEL",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "book tool surface matches the companion contract",
+      "pass": true,
+      "detail": [
+        "book_discover",
+        "book_episode",
+        "book_forget",
+        "book_import_transcript",
+        "book_read_article",
+        "book_recall",
+        "book_remember",
+        "book_review",
+        "book_thread",
+        "book_transcribe"
+      ]
+    },
+    {
+      "name": "decision 1 is book_remember",
+      "pass": true,
+      "detail": {
+        "kind": "tool",
+        "name": "book_remember",
+        "args": "{\"kind\":\"material\",\"text\":\"《史记·项羽本纪》测试材料：项王军壁垓下，兵少食尽；于是项王乃悲歌慷慨。\",\"source\":\"fixture:史记/项羽本纪\"}"
+      }
+    },
+    {
+      "name": "decision 2 is book_recall",
+      "pass": true,
+      "detail": {
+        "kind": "tool",
+        "name": "book_recall",
+        "args": "{\"query\":\"史记\"}"
+      }
+    },
+    {
+      "name": "decision 3 is final text with ROUNDTRIP_OK",
+      "pass": true,
+      "detail": {
+        "kind": "text",
+        "text": "ROUNDTRIP_OK [{\"id\":\"a0df9803-a5a3-4ffd-8e01-6d5bd9b1191d\",\"session_id\":\"session-3f6fc6a3-24be-4a30-9e93-5ed91cf9af1b\",\"kind\":\"material\",\"text\":\"《史记·项羽本纪》测试材料：项王军壁垓下，兵少食尽；于是项王乃悲歌慷慨。\",\"source\":\"fixture:史记/项羽本纪\",\"created_at\":\"2026-10-29T15:24:30.315Z\"}]"
+      }
+    },
+    {
+      "name": "tool result returned to the model",
+      "pass": true,
+      "detail": [
+        "system",
+        "user",
+        "user",
+        "assistant",
+        "tool",
+        "assistant",
+        "tool"
+      ]
+    },
+    {
+      "name": "main session prompt carries MAIN_PERSONA_SENTINEL",
+      "pass": true,
+      "detail": 1
+    },
+    {
+      "name": "book assistant final answer observed",
+      "pass": true,
+      "detail": 3
+    },
+    {
+      "name": "book session persisted as JSONL",
+      "pass": true,
+      "detail": "C:\\Users\\xiale\\.dsh\\sessions\\--C-Users-xiale-AppData-Local-Temp-book-companion-check-N1fGCP-workspace--\\session-3f6fc6a3-24be-4a30-9e93-5ed91cf9af1b\\session.v4.jsonl.zstd"
+    },
+    {
+      "name": "main session persisted as JSONL",
+      "pass": true,
+      "detail": "C:\\Users\\xiale\\.dsh\\sessions\\--C-Users-xiale-AppData-Local-Temp-book-companion-check-N1fGCP-workspace--\\session-3e34edac-6a1f-4d50-acb3-d261b199aaff\\session.v4.jsonl.zstd"
+    },
+    {
+      "name": "persisted book session header records book-companion",
+      "pass": true,
+      "detail": {
+        "type": "session",
+        "version": 4,
+        "id": "session-3f6fc6a3-24be-4a30-9e93-5ed91cf9af1b",
+        "createdAt": 1793287465802,
+        "cwd": "C:\\Users\\xiale\\AppData\\Local\\Temp\\book-companion-check-N1fGCP\\workspace",
+        "isSeeded": false,
+        "delegationDepth": 0,
+        "agentPreset": "book-companion"
+      }
+    },
+    {
+      "name": "persisted main session header records no book preset",
+      "pass": true,
+      "detail": {
+        "type": "session",
+        "version": 4,
+        "id": "session-3e34edac-6a1f-4d50-acb3-d261b199aaff",
+        "createdAt": 1793287470435,
+        "cwd": "C:\\Users\\xiale\\AppData\\Local\\Temp\\book-companion-check-N1fGCP\\workspace",
+        "isSeeded": false,
+        "delegationDepth": 0
+      }
+    }
+  ]
+}

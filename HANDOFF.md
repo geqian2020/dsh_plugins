@@ -1,5 +1,21 @@
 # 交接说明（HANDOFF）
 
+## 最新迭代：0.2.0 持续阅读搭子
+
+已经修改人设，支持自然讨论经历、独立观点与阅读兴趣；新增 RSS/Atom 发现、文章正文提取/入库、共同问题和双方分歧持久化。可选后台阅读在会话空闲时读正文并续接 DSH 会话，默认关闭，带日限额、安静时段和持久化去重；尚未做 QQ 主动投递。
+
+本轮已更新 booktest，不动 desktop。新宿主验证全部使用临时数据。实际测试结果以 `docs/COMPANION-VERIFICATION.md`、`artifacts/companion-host-verification.json` 和 `artifacts/verification.json` 为准；真模型探索测试使用虚构材料，不能当作真实选材质量证明。
+
+核心位置：`src/persona.mjs`、`src/exploration.mjs`、`src/proactive.mjs`、`src/store.mjs`。共享源码经 `scripts/sync-book.mjs` 同步至包，工具合同是 `src/contract.mjs`。版本 0.2.0，新依赖 saxes/linkedom/Mozilla Readability。
+
+复跑：安装根目录依赖后执行 `node scripts/verify.mjs`、`node scripts/pack.mjs`、`node scripts/install-booktest.mjs`、`node scripts/check-companion.mjs --real`。测试启动使用 DSH 随附 Node 与已提取的安装版 CLI；测试探针可以启用虚构阅读源传输，正常配置不启用。详见 `docs/COMPANION.md`。
+
+后续：真实来源与体验评估、OpenViking 网络审计、QQ 真号及出站投递、长音频转写后台队列、统一回归、desktop 上线关卡。`publish.cmd` 已取消强制推送，不要覆盖远端历史。
+
+---
+
+以下是 0.1.x 的历史交接记录，其中数量、工具面和未完成项以最新迭代说明为准。
+
 > 更新时间：2026-10-29 23:05 · 交给下一个接手的 AI
 > 先读这份，再读 `PLAN.md`（目标与验收）和 `docs/ARCHITECTURE.md`（设计）。
 

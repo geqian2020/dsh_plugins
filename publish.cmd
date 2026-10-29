@@ -19,12 +19,12 @@ if /i "%~1"=="--check" (
   exit /b 0
 )
 
-echo [1/3] configure remote
-"%GIT%" remote remove origin >nul 2>&1
-"%GIT%" remote add origin https://github.com/geqian2020/dsh_plugins.git
+echo [1/3] check remote
+"%GIT%" remote get-url origin
+if errorlevel 1 goto fail
 
 echo [2/3] push ^(a browser login window may open^)
-"%GIT%" push -u origin main --force
+"%GIT%" push -u origin main
 if errorlevel 1 goto fail
 
 echo [3/3] done

@@ -1,1 +1,1 @@
-{"name":"dsh-book-companion-workspace","private":true,"type":"module","scripts":{"test":"node --test test/*.test.mjs","inspect":"node scripts/extract-runtime.mjs"},"engines":{"node":">=24"}}
+{"name":"dsh-book-companion-workspace","private":true,"type":"module","scripts":{"test":"node --test test/*.test.mjs","inspect":"node scripts/extract-runtime.mjs"},"engines":{"node":">=24"},"dependencies":{"@mozilla/readability":"0.6.0","linkedom":"0.18.12","saxes":"6.0.0"}}

@@ -12,11 +12,13 @@ export class BookStore {
       CREATE VIRTUAL TABLE IF NOT EXISTS notes_fts USING fts5(id UNINDEXED,text);
       CREATE TABLE IF NOT EXISTS imports(digest TEXT PRIMARY KEY,created_at TEXT NOT NULL);
       CREATE TABLE IF NOT EXISTS tombstones(id TEXT PRIMARY KEY);
-      PRAGMA user_version=1;`);
+      CREATE TABLE IF NOT EXISTS threads(id TEXT PRIMARY KEY,question TEXT NOT NULL,user_view TEXT NOT NULL,assistant_view TEXT NOT NULL,evidence TEXT NOT NULL,resolved INTEGER NOT NULL,updated_at TEXT NOT NULL);
+      CREATE TABLE IF NOT EXISTS outreach(slot TEXT PRIMARY KEY,session_id TEXT NOT NULL,article_url TEXT NOT NULL,status TEXT NOT NULL,created_at TEXT NOT NULL);
+      PRAGMA user_version=2;`);
   }
   add(agent,{kind,text,source}) {
     const session=requireBook(agent);
-    if(!['user-view','assistant-view','material','preference-hypothesis'].includes(kind))throw new Error('Invalid note kind');
+    if(!['user-view','assistant-view','material','preference-hypothesis','assistant-interest'].includes(kind))throw new Error('Invalid note kind');
     if(typeof text!=='string'||!text.trim()||text.length>100000)throw new Error('Invalid note text');
     if(typeof source!=='string'||!source.trim())throw new Error('Source is required');
     const row={id:randomUUID(),session_id:session.header.id,kind,text,source,created_at:new Date().toISOString()};
@@ -85,7 +87,35 @@ export class BookStore {
     requireBook(agent);
     if(!Number.isFinite(Date.parse(since))||!Number.isFinite(Date.parse(until))||Date.parse(since)>=Date.parse(until))throw new Error('Invalid review dates');
     const rows=this.db.prepare('SELECT * FROM notes WHERE created_at>=? AND created_at<? ORDER BY created_at LIMIT 201').all(new Date(since).toISOString(),new Date(until).toISOString());
-    return {truncated:rows.length>200,records:rows.slice(0,200).map(r=>({...r,text:r.text.slice(0,2000),textTruncated:r.text.length>2000}))};
+    return {truncated:rows.length>200,records:rows.slice(0,200).map(r=>({...r,text:r.text.slice(0,2000),textTruncated:r.text.length>2000})),openThreads:this.thread(agent,{action:'list'})};
+  }
+  thread(agent,{action,id,question,userView,assistantView,evidence,resolved}={}){
+    requireBook(agent);
+    if(action==='list')return this.db.prepare('SELECT id,question,user_view AS userView,assistant_view AS assistantView,evidence,resolved,updated_at AS updatedAt FROM threads WHERE resolved=0 ORDER BY updated_at DESC LIMIT 20').all();
+    if(action==='delete'){
+      if(typeof id!=='string'||!id)throw new Error('Thread id required');
+      const result=this.db.prepare('DELETE FROM threads WHERE id=?').run(id);return {deleted:result.changes>0,id};
+    }
+    if(action!=='save')throw new Error('Thread action must be list/save/delete');
+    const existing=id===undefined?undefined:this.db.prepare('SELECT * FROM threads WHERE id=?').get(id);
+    if(id!==undefined&&(typeof id!=='string'||!existing))throw new Error('Unknown thread id');
+    question??=existing?.question;userView??=existing?.user_view??'';assistantView??=existing?.assistant_view??'';evidence??=existing?.evidence??'';resolved??=Boolean(existing?.resolved);
+    for(const [field,value]of Object.entries({question,userView,assistantView,evidence}))if(typeof value!=='string'||value.length>6000)throw new Error('Invalid thread '+field);
+    if(!question.trim()||!evidence.trim())throw new Error('Question and evidence are required');
+    if(typeof resolved!=='boolean')throw new Error('resolved must be boolean');
+    const row={id:id??randomUUID(),question,userView,assistantView,evidence,resolved,updatedAt:new Date().toISOString()};
+    this.db.prepare('INSERT INTO threads VALUES (?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET question=excluded.question,user_view=excluded.user_view,assistant_view=excluded.assistant_view,evidence=excluded.evidence,resolved=excluded.resolved,updated_at=excluded.updated_at').run(row.id,question,userView,assistantView,evidence,Number(resolved),row.updatedAt);
+    return row;
+  }
+  claimOutreach(agent,{slot,url}){
+    const session=requireBook(agent);
+    if(this.db.prepare('SELECT 1 FROM outreach WHERE article_url=?').get(url))return false;
+    return this.db.prepare('INSERT OR IGNORE INTO outreach VALUES (?,?,?,?,?)').run(slot,session.id??session.header.id,url,'pending',new Date().toISOString()).changes===1;
+  }
+  interests(agent){requireBook(agent);return this.db.prepare("SELECT id,text,source FROM notes WHERE kind='assistant-interest' ORDER BY created_at DESC LIMIT 8").all();}
+  finishOutreach(slot,status){
+    if(!['submitted','failed'].includes(status))throw new Error('Invalid outreach state');
+    this.db.prepare('UPDATE outreach SET status=? WHERE slot=?').run(status,slot);
   }
   close(){this.db.close();}
 }

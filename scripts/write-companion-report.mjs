@@ -1,0 +1,10 @@
+import fs from 'node:fs';import path from 'node:path';
+const root=path.resolve(import.meta.dirname,'..');
+const read=file=>JSON.parse(fs.readFileSync(path.join(root,file),'utf8'));
+const unit=read('artifacts/verification.json'),host=read('artifacts/companion-host-verification.json'),pkg=read('packages/book-companion/package.json'),packages=read('dist/checksums.json');
+const number=label=>Number(unit.output.match(new RegExp('(?:ℹ|#) '+label+' (\\d+)'))?.[1]??NaN);
+if(!Number.isFinite(number('tests')))throw new Error('Cannot derive test counts from runner output');
+const names={fake:'真实宿主 / 假模型',real:'真实模型跨会话记忆','exploration-real':'真实模型探索陪读（虚构 RSS/正文）'};
+const lines=[`# 书童 ${pkg.version} 验证记录`,'',`生成时间（UTC）：${new Date().toISOString()}。数字从实际 artifact 推导。`,'','| 检查 | 通过 / 总数 | 结果 |','| --- | --- | --- |',`| 单元与进程内集成 | ${number('pass')} / ${number('tests')} | ${unit.exitCode===0?'PASS':'FAIL'} |`,...host.results.map(r=>`| ${names[r.mode]??r.mode} | ${r.pass} / ${r.total} | ${r.ok?'PASS':'FAIL'} |`),'','宿主：booktest；启动方式：'+host.launch+'。每次新建临时数据库，不写实际阅读库。','', '真实模型使用本地已配置的 deepseek-flash。探索测试中，模型找回双方的旧分歧，调用候选发现和正文读取，使用正文才出现的信息并保存自己的判断。模型明确指出虚构材料不能作为历史证据，保留用户立场。详见 `artifacts/companion-exploration-real.json`。','','后台定时流程的空闲判断、日限额和重启去重由单测验证；没有把它说成真实 QQ 主动投递或真实定时触发的模型验收。外部订阅源可用性与推荐质量未验证。','','## 产物校验和','',...packages.map(p=>`- ${p.file}: SHA256 ${p.sha256}`),'','## 仍未验证','',...host.notVerified.map(s=>'- '+s),'- 长音频后台转写、完整宿主重启/压缩，以及七天真实体验。','','## 证据','', '- `artifacts/verification.json`：单元及进程内集成输出。','- `artifacts/companion-host-verification.json`：各宿主阶段汇总。','- `artifacts/companion-fake.json` 与 `companion-fake-requests.jsonl`：真实工具面、system prompt 和主对照会话。','- `artifacts/companion-real.json`：跨会话真实模型记忆。','- `artifacts/companion-exploration-real.json`：探索工具调用、回答和双方观点。',''];
+fs.writeFileSync(path.join(root,'docs/COMPANION-VERIFICATION.md'),lines.join('\n'));
+console.log('Generated verification document from artifacts');
