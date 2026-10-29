@@ -24,3 +24,6 @@
 {"at":"2026-10-29T08:47:28.753Z","event":"probe-loaded","pid":4448}
 {"at":"2026-10-29T08:47:29.557Z","event":"agent/created","sessionId":"session-6d6e1922-76b6-4a67-8d19-fc0b3a63c18a","agentPreset":"book-companion","cwd":"D:/DSH/shutong","origin":null}
 {"at":"2026-10-29T08:47:31.716Z","event":"agent/created","sessionId":"session-d19913f5-e2b9-40cc-9635-d0c964475a38","agentPreset":"book-companion","cwd":"D:/DSH/shutong","origin":null}
+{"at":"2026-10-29T08:54:58.624Z","event":"probe-loaded","pid":22112}
+{"at":"2026-10-29T08:54:59.523Z","event":"agent/created","sessionId":"session-e1fb0cf8-bda1-42b4-aa3c-16c637c86ee2","agentPreset":"book-companion","cwd":"D:/DSH/shutong","origin":null}
+{"at":"2026-10-29T08:55:00.382Z","event":"agent/created","sessionId":"session-bf054c70-82a4-4e5b-b21a-2693f2d9c692","agentPreset":null,"cwd":"D:/DSH/shutong","origin":null}

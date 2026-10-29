@@ -29,8 +29,22 @@ export class BookStore {
   search(agent,query) {
     requireBook(agent);
     if(typeof query!=='string'||query.length>500)throw new Error('Invalid query');
+    const term=query.trim();
+    if(!term)return [];
     // Literal substring supports Chinese terms without relying on ASCII token segmentation.
-    return this.db.prepare('SELECT * FROM notes WHERE instr(text,?)>0 ORDER BY created_at DESC LIMIT 12').all(query).map(r=>({...r,text:r.text.slice(0,4000)}));
+    const exact=this.db.prepare('SELECT * FROM notes WHERE instr(text,?)>0 ORDER BY created_at DESC LIMIT 12').all(term);
+    if(exact.length>0)return exact.map(r=>({...r,text:r.text.slice(0,4000)}));
+    // 转写有错字时（宫崎骏→宫崎俊），退化成二元组匹配，按命中数排序
+    const chars=[...term];
+    if(chars.length<3)return [];
+    const grams=[...new Set(chars.slice(0,-1).map((c,i)=>c+chars[i+1]))];
+    const rows=this.db.prepare(`SELECT * FROM notes WHERE ${grams.map(()=>'instr(text,?)>0').join(' OR ')} ORDER BY created_at DESC LIMIT 60`).all(...grams);
+    const minScore=Math.max(1,Math.ceil(grams.length/2));
+    return rows.map(r=>({...r,score:grams.filter(g=>r.text.includes(g)).length}))
+      .filter(r=>r.score>=minScore)
+      .sort((a,b)=>b.score-a.score||(a.created_at<b.created_at?1:-1))
+      .slice(0,12)
+      .map(({score,...r})=>({...r,text:r.text.slice(0,4000),match:'fuzzy'}));
   }
   capture(session,event){
     requireBook({session});

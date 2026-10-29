@@ -1,16 +1,16 @@
 {
   "ok": true,
   "mode": "fake",
-  "at": "2026-10-29T08:46:24.275Z",
+  "at": "2026-10-29T08:55:19.117Z",
   "profile": "booktest",
-  "hostPid": 10636,
+  "hostPid": 22112,
   "node": "v24.18.1",
   "modelSelection": {
     "provider": "fake-gateway",
     "model": "fake-model"
   },
-  "bookSessionId": "session-5220bbfd-10cb-474d-8596-9b46ef5debe2",
-  "mainSessionId": "session-e998c075-0e95-462e-9709-c409fcb2886a",
+  "bookSessionId": "session-e1fb0cf8-bda1-42b4-aa3c-16c637c86ee2",
+  "mainSessionId": "session-bf054c70-82a4-4e5b-b21a-2693f2d9c692",
   "modelRequests": {
     "book": 3,
     "main": 1,
@@ -83,7 +83,7 @@
       "pass": true,
       "detail": {
         "kind": "text",
-        "text": "ROUNDTRIP_OK [{\"id\":\"dbc82ddd-02b2-4062-8937-4334e07e7991\",\"session_id\":\"session-5220bbfd-10cb-474d-8596-9b46ef5debe2\",\"kind\":\"material\",\"text\":\"《史记·项羽本纪》测试材料：项王军壁垓下，兵少食尽；于是项王乃悲歌慷慨。\",\"source\":\"fixture:史记/项羽本纪\",\"created_at\":\"2026-10-29T08:46:04.595Z\"},{\"id\":\"62ac6e8eda0952d4ad242af12a5b5192709003b2cca5b331f018653"
+        "text": "ROUNDTRIP_OK [{\"id\":\"409d5adb-8a36-4f2e-bd3d-2bc10000968d\",\"session_id\":\"session-e1fb0cf8-bda1-42b4-aa3c-16c637c86ee2\",\"kind\":\"material\",\"text\":\"《史记·项羽本纪》测试材料：项王军壁垓下，兵少食尽；于是项王乃悲歌慷慨。\",\"source\":\"fixture:史记/项羽本纪\",\"created_at\":\"2026-10-29T08:55:00.031Z\"},{\"id\":\"2134a7e16749c80877bfac5c8192def819257744f36be31fcedd232"
       }
     },
     {
@@ -112,12 +112,12 @@
     {
       "name": "book session persisted as JSONL",
       "pass": true,
-      "detail": "C:\\Users\\xiale\\.dsh\\sessions\\--D-DSH-shutong--\\session-5220bbfd-10cb-474d-8596-9b46ef5debe2\\session.v4.jsonl.zstd"
+      "detail": "C:\\Users\\xiale\\.dsh\\sessions\\--D-DSH-shutong--\\session-e1fb0cf8-bda1-42b4-aa3c-16c637c86ee2\\session.v4.jsonl.zstd"
     },
     {
       "name": "main session persisted as JSONL",
       "pass": true,
-      "detail": "C:\\Users\\xiale\\.dsh\\sessions\\--D-DSH-shutong--\\session-e998c075-0e95-462e-9709-c409fcb2886a\\session.v4.jsonl.zstd"
+      "detail": "C:\\Users\\xiale\\.dsh\\sessions\\--D-DSH-shutong--\\session-bf054c70-82a4-4e5b-b21a-2693f2d9c692\\session.v4.jsonl.zstd"
     },
     {
       "name": "persisted book session header records book-companion",
@@ -125,8 +125,8 @@
       "detail": {
         "type": "session",
         "version": 4,
-        "id": "session-5220bbfd-10cb-474d-8596-9b46ef5debe2",
-        "createdAt": 1793263563833,
+        "id": "session-e1fb0cf8-bda1-42b4-aa3c-16c637c86ee2",
+        "createdAt": 1793264099478,
         "cwd": "D:/DSH/shutong",
         "isSeeded": false,
         "delegationDepth": 0,
@@ -139,8 +139,8 @@
       "detail": {
         "type": "session",
         "version": 4,
-        "id": "session-e998c075-0e95-462e-9709-c409fcb2886a",
-        "createdAt": 1793263564826,
+        "id": "session-bf054c70-82a4-4e5b-b21a-2693f2d9c692",
+        "createdAt": 1793264100304,
         "cwd": "D:/DSH/shutong",
         "isSeeded": false,
         "delegationDepth": 0

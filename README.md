@@ -23,7 +23,7 @@
 | --- | --- | --- |
 | 组合层 | `cordis.patch.yml` 把运行时挂在 `@deepseek-ai/dsh-agent-preset` 的 `book-companion` 预设内，不全局注册 | 会话 header `agentPreset=book-companion` |
 | 工具层 | `ctx.tools.guard` 拒绝一切非 `book_*` 调用；`agent/created` 时 `tools.restrict` 只放行 7 个工具 | 模型侧工具面恰好 7 个，无主记忆 / 文件 / 命令工具 |
-| 提示词层 | `systemPrompt.section({complete:true})` 整体替换系统提示词 | 书童 977 字符 vs 主会话 3049 字符，且不含 `MAIN_PERSONA_SENTINEL` |
+| 提示词层 | `systemPrompt.section({complete:true})` 整体替换系统提示词 | 书童 1043 字符 vs 主会话 3049 字符，且不含 `MAIN_PERSONA_SENTINEL` |
 | 记忆层 | `dsh-openviking-memory-isolated` fork：按预设 / 工作目录跳过主记忆的画像注入、召回、捕获、提交与 flush，并拦截 `mcp__openviking__*` | 新增会话/重启后仍不注入主画像（见 `docs/ARCHITECTURE.md`） |
 
 书童自己的记忆落在 `~/.dsh/book-companion/reading.sqlite`，记录保留 `kind / text / source / session_id / created_at`，
@@ -58,7 +58,7 @@
 **已证实的真机行为**（`artifacts/host-check.json`，17/17）
 
 - 首条消息前 header 已带 `agentPreset: book-companion`；
-- 主对照会话（3049 字符）带 `MAIN_PERSONA_SENTINEL`，书童（977 字符）不带——隔离不是「没注入」造成的假阴性；
+- 主对照会话（3049 字符）带 `MAIN_PERSONA_SENTINEL`，书童（1043 字符）不带——隔离不是「没注入」造成的假阴性；
 - 工具面恰好 7 个 `book_*`；
 - 假模型一轮内完成 `book_remember → book_recall → ROUNDTRIP_OK`，工具结果以 `tool` 角色回传；
 - 会话落盘 `session.v4.jsonl.zstd`，header 记录预设。
