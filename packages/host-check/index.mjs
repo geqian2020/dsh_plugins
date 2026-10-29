@@ -3,6 +3,7 @@ import zlib from 'node:zlib';
 import os from 'node:os';
 import path from 'node:path';
 import { randomUUID } from 'node:crypto';
+import { DatabaseSync } from 'node:sqlite';
 import { createUserMessage } from '@deepseek-ai/dsh-llm';
 
 export const name = 'book-host-check';
@@ -55,6 +56,30 @@ const readPersistedHeader = (file) => {
   }
 };
 
+const bookDbPath = () => path.join(process.env.DSH_HOME ?? path.join(os.homedir(), '.dsh'), 'book-companion', 'reading.sqlite');
+const countNotes = (needle) => {
+  try {
+    const db = new DatabaseSync(bookDbPath(), { readOnly: true });
+    const row = needle === undefined
+      ? db.prepare('SELECT COUNT(*) AS c FROM notes').get()
+      : db.prepare('SELECT COUNT(*) AS c FROM notes WHERE instr(text, ?) > 0').get(needle);
+    db.close();
+    return Number(row?.c ?? 0);
+  } catch (error) {
+    return -1;
+  }
+};
+const countRemembered = (needle) => {
+  try {
+    const db = new DatabaseSync(bookDbPath(), { readOnly: true });
+    const row = db.prepare("SELECT COUNT(*) AS c FROM notes WHERE source LIKE 'smoke-test%' AND instr(text, ?) > 0").get(needle);
+    db.close();
+    return Number(row?.c ?? 0);
+  } catch (error) {
+    return -1;
+  }
+};
+
 export function apply(ctx, config = {}) {
   const run = async () => {
     const checks = [];
@@ -93,6 +118,53 @@ export function apply(ctx, config = {}) {
     };
 
     const bookSessionId = 'session-' + randomUUID();
+
+    // 真模型模式：判据不是「假网关脚本返回了什么」，而是
+    //   1) 书童的库里真的出现了 material 行（写路径）
+    //   2) 换一个全新会话，能否凭 book_recall 把这条内容取回来（读路径）
+    if ((config.mode ?? 'fake') === 'real') {
+      const secret = config.secret ?? 'SMOKE_SECRET_青鸾-7391';
+      const taskWrite = config.bookTask
+        ?? `请把这条记到你的阅读记忆里（source 写 smoke-test）：『暗号：${secret}』。记完回我一句确认，不要展开。`;
+      const taskRecall = config.recallTask
+        ?? '我们之前记过一个暗号。请先用 book_recall 查一下，再告诉我暗号内容。';
+
+      const writeRun = await drive(bookSessionId, config.preset ?? 'book-companion', taskWrite);
+      const rememberedRows = countRemembered(secret);
+
+      const recallSessionId = 'session-' + randomUUID();
+      const recallRun = await drive(recallSessionId, config.preset ?? 'book-companion', taskRecall);
+      const recallSerialized = JSON.stringify(recallRun.events);
+      const recallCalled = /book_recall/.test(recallSerialized);
+      const recalledAnswer = recallRun.events.some((event) => event.type === 'assistant/message' && JSON.stringify(event.data).includes(secret));
+      const failures = [...writeRun.events, ...recallRun.events].filter((event) => String(event.type).includes('error'));
+
+      check('preset resolves to book-companion', writeRun.resolvedId === 'book-companion', writeRun.resolvedId);
+      check('write session header.agentPreset is book-companion', writeRun.header.agentPreset === 'book-companion', writeRun.header.agentPreset);
+      check('book_remember wrote a row with source smoke-test', rememberedRows >= 1, { secret, rememberedRows });
+      check('recall happens in a different session', recallRun.header.id !== writeRun.header.id, recallRun.header.id);
+      check('book_recall called in the recall session', recallCalled, recallSerialized.length);
+      check('cross-session recall returned the secret', recalledAnswer, null);
+      check('no error events', failures.length === 0, failures.length);
+
+      const report = {
+        ok: checks.every((entry) => entry.pass),
+        mode: 'real',
+        at: new Date().toISOString(),
+        profile: config.profileName ?? 'booktest',
+        hostPid: process.pid,
+        node: process.version,
+        modelSelection: selection,
+        writeSessionId: bookSessionId,
+        recallSessionId,
+        secret,
+        checks
+      };
+      write(config.reportFile ?? 'host-smoke.json', report);
+      appendLog(JSON.stringify({ at: report.at, mode: 'real', ok: report.ok, failed: checks.filter((c) => !c.pass).map((c) => c.name) }));
+      return report.ok;
+    }
+
     const book = await drive(bookSessionId, config.preset ?? 'book-companion', config.bookTask ?? '请读一下这段材料并记住，然后回忆给我。');
     check('preset resolves to book-companion', book.resolvedId === 'book-companion', book.resolvedId);
     check('book session header.agentPreset is book-companion', book.header.agentPreset === 'book-companion', book.header.agentPreset);
@@ -133,6 +205,7 @@ export function apply(ctx, config = {}) {
 
     const report = {
       ok: checks.every((entry) => entry.pass),
+      mode: 'fake',
       at: new Date().toISOString(),
       profile: config.profileName ?? 'booktest',
       hostPid: process.pid,
@@ -143,7 +216,7 @@ export function apply(ctx, config = {}) {
       modelRequests: { book: bookRequests.length, main: mainRequests.length, total: requests.length },
       checks,
     };
-    write('host-check.json', report);
+    write(config.reportFile ?? 'host-check.json', report);
     appendLog(JSON.stringify({ at: report.at, ok: report.ok, failed: checks.filter((c) => !c.pass).map((c) => c.name) }));
     return report.ok;
   };

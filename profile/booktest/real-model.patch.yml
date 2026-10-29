@@ -1,0 +1,14 @@
+# 临时覆盖：用真实 DeepSeek 模型跑书童冒烟（不改 profile 本体）
+# 用法：dsh booktest --patch profile/booktest/real-model.patch.yml --no-open --port 19398
+- id: agent-default-model
+  config:
+    provider: deepseek-official
+    model: deepseek-flash
+
+- id: book-host-check
+  config:
+    mode: real
+    cwd: D:/DSH/shutong
+    profileName: booktest
+    reportFile: host-smoke.json
+    secret: SMOKE_SECRET_青鸾-7391

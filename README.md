@@ -3,8 +3,8 @@
 一个挂在 **DSH（DeepSeek Harness）** 上的阅读搭子：**独立人设 + 独立记忆**，与主助手物理隔离。
 不是通用助手，只做阅读、讨论、纠错、回顾。
 
-> 当前阶段：**P0-1 真机开机已通过**（真实宿主 + 测试 profile + 假模型，17/17 断言），
-> P0-2 真模型 + 沙盒 OpenViking、P0-3 QQ 真号仍在等待外部凭据。
+> 当前阶段：**P0-1 真机开机 17/17**，**P0-2 真模型 7/7**（`deepseek-flash` 写入 + 跨会话召回）；
+> OpenViking 沙盒与 QQ 真号仍在等待外部凭据。
 > 本仓库是开发快照，**尚未上线，也未改动任何正式 desktop 配置**。
 
 ## 它要解决的问题
@@ -23,7 +23,7 @@
 | --- | --- | --- |
 | 组合层 | `cordis.patch.yml` 把运行时挂在 `@deepseek-ai/dsh-agent-preset` 的 `book-companion` 预设内，不全局注册 | 会话 header `agentPreset=book-companion` |
 | 工具层 | `ctx.tools.guard` 拒绝一切非 `book_*` 调用；`agent/created` 时 `tools.restrict` 只放行 6 个工具 | 模型侧工具面恰好 6 个，无主记忆 / 文件 / 命令工具 |
-| 提示词层 | `systemPrompt.section({complete:true})` 整体替换系统提示词 | 书童 231 字符 vs 主会话 3049 字符，且不含 `MAIN_PERSONA_SENTINEL` |
+| 提示词层 | `systemPrompt.section({complete:true})` 整体替换系统提示词 | 书童 977 字符 vs 主会话 3049 字符，且不含 `MAIN_PERSONA_SENTINEL` |
 | 记忆层 | `dsh-openviking-memory-isolated` fork：按预设 / 工作目录跳过主记忆的画像注入、召回、捕获、提交与 flush，并拦截 `mcp__openviking__*` | 新增会话/重启后仍不注入主画像（见 `docs/ARCHITECTURE.md`） |
 
 书童自己的记忆落在 `~/.dsh/book-companion/reading.sqlite`，记录保留 `kind / text / source / session_id / created_at`，
@@ -34,7 +34,7 @@
 | # | 任务 | 状态 | 说明 |
 | --- | --- | --- | --- |
 | P0-1 | 真机开机（测试 profile） | ✅ 17/17 | 真实宿主、假模型、完整 `book_remember → book_recall` 链路 |
-| P0-2 | 真模型 + 沙盒 OpenViking | ⏳ 阻塞 | 本机无 `~/.openviking/ovcli.conf`，等待沙盒 endpoint/key 或独立 peer 授权 |
+| P0-2 | 真模型 + 沙盒 OpenViking | 🟡 真模型已通，OpenViking 仍阻塞 | `deepseek-flash` 跑通「写入 → 新会话召回」7/7；OpenViking 仍缺沙盒 endpoint/key |
 | P0-3 | QQ 真号 | ⏳ 阻塞 | 等待机器人凭据配置进测试 profile（不入仓库） |
 | P1-4 | `verify-all.mjs` 一条命令复现 | 🟢 可做 | 串起 12 + 79 + 7 项测试、真机开机、构建导入冒烟 |
 | P1-5 | 产品最小闭环 | ⏸ 待 2/3 | 文章/播客转写 → 分段 → 记住 → 回顾（音频/ASR 后置） |
@@ -57,10 +57,18 @@
 **已证实的真机行为**（`artifacts/host-check.json`，17/17）
 
 - 首条消息前 header 已带 `agentPreset: book-companion`；
-- 主对照会话（3049 字符）带 `MAIN_PERSONA_SENTINEL`，书童（231 字符）不带——隔离不是「没注入」造成的假阴性；
+- 主对照会话（3049 字符）带 `MAIN_PERSONA_SENTINEL`，书童（977 字符）不带——隔离不是「没注入」造成的假阴性；
 - 工具面恰好 6 个 `book_*`；
 - 假模型一轮内完成 `book_remember → book_recall → ROUNDTRIP_OK`，工具结果以 `tool` 角色回传；
 - 会话落盘 `session.v4.jsonl.zstd`，header 记录预设。
+
+**真模型冒烟**（`artifacts/host-smoke.json`，7/7，`deepseek-flash`）
+
+- 书童会话里真实调用 `book_remember`，SQLite 出现 `source=smoke-test` 的记录；
+- **换一个全新会话**，只给一句「我们之前记过一个暗号」，模型先 `book_recall` 再答，取回了正确内容；
+- 两次会话 header 都是 `book-companion`，无错误事件。
+
+> 这只证明「真模型会用这 6 个工具、记忆能跨会话取回」，不等于陪读质量、延迟与费用已评估。
 
 **未验证**
 
@@ -109,6 +117,7 @@ docs/                        架构、验证、环境搭建
 | [artifacts/host-boot-evidence.md](artifacts/host-boot-evidence.md) | 人类可读的验证报告（生成自上面的 JSON） |
 | [artifacts/fake-llm.jsonl](artifacts/fake-llm.jsonl) | 模型实际收到的 system prompt、tools、消息角色序列 |
 | [artifacts/host-probe.jsonl](artifacts/host-probe.jsonl) | 宿主探针事件流 |
+| [artifacts/host-smoke.json](artifacts/host-smoke.json) | 真模型冒烟：写入 + 跨会话召回的 7 条断言 |
 | [artifacts/verification.json](artifacts/verification.json) | 12 项测试报告与未验证清单 |
 | [artifacts/im-verification.json](artifacts/im-verification.json) | QQ 回归 79 项 + 状态恢复 7 项 |
 

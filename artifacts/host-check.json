@@ -1,19 +1,20 @@
 {
   "ok": true,
-  "at": "2026-10-28T17:02:26.431Z",
+  "mode": "fake",
+  "at": "2026-10-29T06:32:23.624Z",
   "profile": "booktest",
-  "hostPid": 16760,
+  "hostPid": 21368,
   "node": "v24.18.1",
   "modelSelection": {
     "provider": "fake-gateway",
     "model": "fake-model"
   },
-  "bookSessionId": "session-ed5bbd36-b8a6-4dd5-8fbe-01f1f71af364",
-  "mainSessionId": "session-d54e9d23-8e96-4aa4-9d9c-b961b211cbf9",
+  "bookSessionId": "session-0dcda6c4-0d05-4abc-9888-07d9b4ea3750",
+  "mainSessionId": "session-db34190e-54f1-47d0-a02b-3c75eed8f33e",
   "modelRequests": {
-    "book": 3,
-    "main": 1,
-    "total": 6
+    "book": 6,
+    "main": 2,
+    "total": 12
   },
   "checks": [
     {
@@ -34,12 +35,12 @@
     {
       "name": "book model requests observed",
       "pass": true,
-      "detail": 3
+      "detail": 6
     },
     {
       "name": "book system prompt contains companion persona",
       "pass": true,
-      "detail": 231
+      "detail": 977
     },
     {
       "name": "book system prompt excludes MAIN_PERSONA_SENTINEL",
@@ -81,7 +82,7 @@
       "pass": true,
       "detail": {
         "kind": "text",
-        "text": "ROUNDTRIP_OK [{\"id\":\"14576e97-d3c5-4ec4-b68b-00f5b2ffde74\",\"session_id\":\"session-ed5bbd36-b8a6-4dd5-8fbe-01f1f71af364\",\"kind\":\"material\",\"text\":\"《史记·项羽本纪》测试材料：项王军壁垓下，兵少食尽；于是项王乃悲歌慷慨。\",\"source\":\"fixture:史记/项羽本纪\",\"created_at\":\"2026-10-28T17:02:23.138Z\"},{\"id\":\"0d6b8d758ccc6bdf9c99b855bbc6bf5270e1c09449c6bbf0cd615bb"
+        "text": "ROUNDTRIP_OK [{\"id\":\"74609f33-7a23-45cf-8c69-639ef4bb161f\",\"session_id\":\"session-8397878a-a891-4488-bb47-01c4f4b06feb\",\"kind\":\"material\",\"text\":\"《史记·项羽本纪》测试材料：项王军壁垓下，兵少食尽；于是项王乃悲歌慷慨。\",\"source\":\"fixture:史记/项羽本纪\",\"created_at\":\"2026-10-29T06:27:20.485Z\"},{\"id\":\"a6284dcaa46596f70eb369a7315a9046b28b7d45a2463593cda5889"
       }
     },
     {
@@ -100,7 +101,7 @@
     {
       "name": "main session prompt carries MAIN_PERSONA_SENTINEL",
       "pass": true,
-      "detail": 1
+      "detail": 2
     },
     {
       "name": "book assistant final answer observed",
@@ -110,12 +111,12 @@
     {
       "name": "book session persisted as JSONL",
       "pass": true,
-      "detail": "C:\\Users\\xiale\\.dsh\\sessions\\--D-DSH-shutong--\\session-ed5bbd36-b8a6-4dd5-8fbe-01f1f71af364\\session.v4.jsonl.zstd"
+      "detail": "C:\\Users\\xiale\\.dsh\\sessions\\--D-DSH-shutong--\\session-0dcda6c4-0d05-4abc-9888-07d9b4ea3750\\session.v4.jsonl.zstd"
     },
     {
       "name": "main session persisted as JSONL",
       "pass": true,
-      "detail": "C:\\Users\\xiale\\.dsh\\sessions\\--D-DSH-shutong--\\session-d54e9d23-8e96-4aa4-9d9c-b961b211cbf9\\session.v4.jsonl.zstd"
+      "detail": "C:\\Users\\xiale\\.dsh\\sessions\\--D-DSH-shutong--\\session-db34190e-54f1-47d0-a02b-3c75eed8f33e\\session.v4.jsonl.zstd"
     },
     {
       "name": "persisted book session header records book-companion",
@@ -123,8 +124,8 @@
       "detail": {
         "type": "session",
         "version": 4,
-        "id": "session-ed5bbd36-b8a6-4dd5-8fbe-01f1f71af364",
-        "createdAt": 1793206942959,
+        "id": "session-0dcda6c4-0d05-4abc-9888-07d9b4ea3750",
+        "createdAt": 1793255523806,
         "cwd": "D:/DSH/shutong",
         "isSeeded": false,
         "delegationDepth": 0,
@@ -137,8 +138,8 @@
       "detail": {
         "type": "session",
         "version": 4,
-        "id": "session-d54e9d23-8e96-4aa4-9d9c-b961b211cbf9",
-        "createdAt": 1793206943212,
+        "id": "session-db34190e-54f1-47d0-a02b-3c75eed8f33e",
+        "createdAt": 1793255524321,
         "cwd": "D:/DSH/shutong",
         "isSeeded": false,
         "delegationDepth": 0

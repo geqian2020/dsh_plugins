@@ -36,7 +36,7 @@
 | 2 | 首条消息前会话 header 已是 `book-companion` | PASS | `book-companion` |
 | 3 | 主对照会话不是 `book-companion` | PASS | `null` |
 | 4 | 观测到书童模型请求 | PASS | 3 |
-| 5 | 书童提示词含「阅读搭子」人设 | PASS | 231 字符 |
+| 5 | 书童提示词含「阅读搭子」人设 | PASS | 977 字符 |
 | 6 | 书童提示词**不含** `MAIN_PERSONA_SENTINEL` | PASS | — |
 | 7 | 工具面恰好 6 个 `book_*` | PASS | `book_episode / book_forget / book_import_transcript / book_recall / book_remember / book_review` |
 | 8 | 第 1 个决策是 `book_remember` | PASS | `{kind:"tool",name:"book_remember"}` |
@@ -69,7 +69,7 @@
 
 ### 1. 隔离是真的，不是假阴性
 
-书童提示词 231 字符，只含人设；主对照会话的提示词 3049 字符，含探针注入的
+书童提示词 977 字符（补全后的 persona），只含自身人设；主对照会话的提示词 3049 字符，含探针注入的
 `MAIN_PERSONA_SENTINEL`。两者在同一次宿主运行、同一个模型、同一个工作目录下产生，
 所以「书童没有主画像」不是「主画像压根没加载」的结果。
 
@@ -85,6 +85,36 @@
 最终回答里带回了刚写入的完整记录（含 UUID 与 `created_at`）。这说明：
 写入 → 检索 → 结果回传 → 模型消费，四步都通。
 
+## 真模型冒烟（2026-10-29，deepseek-flash）
+
+假模型只能证明「管线通」，不能证明「模型会用」。所以在 persona 补到 977 字符后，
+用真实 `deepseek-official / deepseek-flash` 跑了一轮**写 + 跨会话读**：
+
+| # | 断言 | 结果 | 实测 |
+| --- | --- | --- | --- |
+| 1 | 预设解析为 `book-companion` | PASS | `book-companion` |
+| 2 | 写入会话 header 带预设 | PASS | `book-companion` |
+| 3 | `book_remember` 真的写进库 | PASS | `source=smoke-test` 命中 2 行（kind 由模型判为 `user-view`） |
+| 4 | 召回发生在另一个会话 | PASS | `session-18d99e4d-...` |
+| 5 | 召回会话调用了 `book_recall` | PASS | 事件流命中 |
+| 6 | 跨会话召回拿到暗号 | PASS | 回答含 `SMOKE_SECRET_青鸾-7391` |
+| 7 | 无错误事件 | PASS | 0 |
+
+做法：写入会话只说一句「请把这条记到阅读记忆里（source 写 smoke-test）」；
+随后**新开一个会话**，只给「我们之前记过一个暗号，请先 book_recall 再答」。
+模型在第二个会话里没有任何上下文，能答对只能来自记忆读取。
+
+复跑：
+
+```powershell
+dsh booktest --patch profile/booktest/real-model.patch.yml --no-open --port 19398
+```
+
+报告写入 `artifacts/host-smoke.json`。
+
+**这只证明工具可用、记忆能跨会话取回**；陪读质量、延迟、费用仍未评估，也没有覆盖
+长时间对话、材料导入、回顾等场景。
+
 ## 数字口径（重要）
 
 对话里曾总结为「18/18」，但 `artifacts/host-check.json` 里实际是 **17 条 check，17 条 pass，0 条 fail**
@@ -93,7 +123,7 @@
 
 ## 未证明的部分
 
-- 真实模型（DeepSeek / 其他）在 231 字符提示词下的工具调用质量；
+- 真实模型在长对话、材料导入、回顾场景下的表现（冒烟只覆盖单轮记忆）；
 - 真实 OpenViking 的 HTTP 写入与跨会话召回；
 - QQ 真号的收发、限流、断线重连；
 - 完整播客音频下载与外部 ASR；

@@ -8,6 +8,8 @@ const PORT = Number(process.env.FAKE_LLM_PORT ?? 19733);
 const ART = 'D:/antigravity_veido/book-companion/artifacts';
 const LOG = path.join(ART, 'fake-llm.jsonl');
 fs.mkdirSync(ART, { recursive: true });
+// 每次启动清空日志：否则 host-check 会读到上一轮的请求，把旧 prompt 长度当成这一轮的结论。
+fs.writeFileSync(LOG, '');
 const log = (record) => fs.appendFileSync(LOG, JSON.stringify({ at: new Date().toISOString(), ...record }) + '\n');
 const uid = () => 'call_' + Math.random().toString(36).slice(2, 12);
 const toolCall = (name, args) => ({ id: uid(), type: 'function', function: { name, arguments: JSON.stringify(args) } });

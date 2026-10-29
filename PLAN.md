@@ -53,11 +53,12 @@ P3   上线关卡：替换主记忆 bundle、备份回滚、7 天真实试用评
   - 会话落盘 `session.v4.jsonl.zstd`，header 正确。
 - **证据**：`artifacts/host-boot-evidence.md`、`artifacts/host-check.json`、`artifacts/fake-llm.jsonl`、`artifacts/host-probe.jsonl`。
 
-### P0-2 真模型 + 沙盒 OpenViking（下一步，等待输入）
+### P0-2 真模型 + 沙盒 OpenViking（真模型 ✅ / OpenViking ⏳）
 
-- **做法**：测试 profile 接真实模型（共享 DSH 凭据或临时 key）+ 独立 OpenViking 沙盒实例；书童执行一次 `book_remember`，新开一轮/新会话执行 `book_recall`，验证从 OpenViking 写→读的往返；同时抓真实 HTTP 请求与 session 事件。
-- **验收**：真实模型请求成功；OpenViking 写入可查；新会话 recall 能召回刚写入内容；书童会话的 profile/recall 注入为**书童自己的记忆空间**，不是主记忆；完整重启、压缩、后台任务各跑一遍。
+- **真模型部分已完成（7/7）**：`deepseek-official / deepseek-flash` 下，书童会话真实调用 `book_remember`（`source=smoke-test` 落库），随后**新开会话**只给一句「我们之前记过一个暗号」，模型先 `book_recall` 再答，取回正确内容。证据：`artifacts/host-smoke.json`，复跑用 `profile/booktest/real-model.patch.yml`。
+- **仍未验证**：主记忆隔离插件在**真实 OpenViking** 下的行为——画像是否真的不注入、召回是否真的被跳过、是否不会写进主记忆空间；以及完整重启、压缩、后台任务各跑一遍。
 - **阻塞**：本机没有 `~/.openviking/ovcli.conf`/`ov.conf`。需要：**A** 沙盒实例 endpoint + key；或 **B** 授权使用现有实例但指定独立 peer 隔离。
+- **注意**：书童自己的记忆是 SQLite，不依赖 OpenViking；OpenViking 只影响「书童与主助手并存」时的隔离审计。
 
 ### P0-3 QQ 真号（等待凭据）
 
@@ -96,6 +97,6 @@ P3   上线关卡：替换主记忆 bundle、备份回滚、7 天真实试用评
 ## 8. 风险与边界
 
 - 现在证明的是“组合/身份/提示词隔离/工具面/记忆工具链路”，**不等于**真实模型质量与真实 OpenViking 网络往返。
-- 书童系统提示词实测只有 231 字符（`complete:true` 清空了宿主内置指令），接真模型前建议补必要的工具使用说明，否则真模型表现可能打折。
+- 书童系统提示词已从 231 字符补到 977 字符（工具语义、记忆纪律、诚实边界），并用 `deepseek-flash` 跑通「写入 → 跨会话召回」7/7；长对话、材料导入、回顾仍未验证。
 - 两个 fork（主记忆 bundle、dsh-im 源码改版）是主要维护成本，上游升级必须重做补丁并重跑 verify-all。
 - 正式上线前必须：备份原配置、保留回滚、7 天真实试用评估质量/速度/费用。

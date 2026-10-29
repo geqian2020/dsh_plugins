@@ -1,2 +1,14 @@
 {"at":"2026-10-28T17:02:26.431Z","ok":true,"failed":[]}
 {"event":"host-check-exit","ok":true}
+{"at":"2026-10-29T06:26:28.466Z","ok":true,"failed":[]}
+{"event":"host-check-exit","ok":true}
+{"at":"2026-10-29T06:27:39.273Z","ok":true,"failed":[]}
+{"event":"host-check-exit","ok":true}
+{"at":"2026-10-29T06:28:37.695Z","mode":"real","ok":true,"failed":[]}
+{"event":"host-check-exit","ok":true}
+{"at":"2026-10-29T06:29:52.807Z","mode":"real","ok":false,"failed":["book_remember wrote a material row with source smoke-test"]}
+{"event":"host-check-exit","ok":false}
+{"at":"2026-10-29T06:30:39.403Z","mode":"real","ok":true,"failed":[]}
+{"event":"host-check-exit","ok":true}
+{"at":"2026-10-29T06:32:23.624Z","ok":true,"failed":[]}
+{"event":"host-check-exit","ok":true}
