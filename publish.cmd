@@ -1,26 +1,43 @@
 @echo off
-chcp 65001 >nul
+setlocal
 cd /d D:\antigravity_veido\book-companion
 
-echo [1/3] 配置远端
-git remote remove origin >nul 2>&1
-git remote add origin https://github.com/geqian2020/dsh_plugins.git
+set "GITROOT=C:\Users\xiale\AppData\Local\Programs\WorkBuddy\resources\vendor\PortableGit"
+if not exist "%GITROOT%\cmd\git.exe" (
+  echo [ERROR] git.exe not found at %GITROOT%
+  echo Install Git for Windows, or edit GITROOT in this file.
+  pause
+  exit /b 1
+)
+set "PATH=%GITROOT%\cmd;%GITROOT%\mingw64\bin;%PATH%"
+set "GIT=%GITROOT%\cmd\git.exe"
 
-echo [2/3] 推送（会弹出 GitHub 登录窗口）
-git push -f -u origin main
+if /i "%~1"=="--check" (
+  "%GIT%" --version
+  "%GIT%" remote -v
+  "%GIT%" log --oneline -3
+  exit /b 0
+)
+
+echo [1/3] configure remote
+"%GIT%" remote remove origin >nul 2>&1
+"%GIT%" remote add origin https://github.com/geqian2020/dsh_plugins.git
+
+echo [2/3] push ^(a browser login window may open^)
+"%GIT%" push -u origin main --force
 if errorlevel 1 goto fail
 
-echo [3/3] 完成
-git log --oneline -3
-goto end
+echo [3/3] done
+"%GIT%" log --oneline -3
+pause
+exit /b 0
 
 :fail
 echo.
-echo 推送失败。常见原因：
-echo   1. 浏览器登录窗口被关掉 —— 重新运行本脚本
-echo   2. 网络到 github.com 不通 —— 挂代理后重试
-echo   3. 远端有你不想要的提交 —— 本脚本已用 -f 覆盖 main
-
-:end
+echo Push failed. Common causes:
+echo   1. Login window closed - run this script again
+echo   2. Cannot reach github.com - check proxy / VPN
+echo   3. Credential Manager blocked - try Git Bash instead
 echo.
 pause
+exit /b 1
